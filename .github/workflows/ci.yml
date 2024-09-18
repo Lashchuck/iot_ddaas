@@ -56,8 +56,13 @@ jobs:
       - name: List Docker containers
         run: docker ps
 
-      - name: Wait for PostgreSQL to be ready
-        run:  docker-compose run --rm postgres sh -c "until pg_isready -U postgres; do sleep 1; done"
+      - name: Wait for PostgreSQL to start
+        run:  |
+          echo "Waiting for PostgreSQL to be ready..."
+          sleep 10
+          until pg_isready -h postgres-test-container -p 5433 -U postgres; do
+            sleep 1
+          done
 
       - name: Check PostgreSQL logs
         run: docker logs $(docker ps -q --filter "ancestor=postgres:13")
