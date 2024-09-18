@@ -11,8 +11,7 @@ services:
       TZ: Europe/Warsaw
     ports:
       - "5432:5432"
-    networks:
-      - my-network
+
 
   app:
     build:
