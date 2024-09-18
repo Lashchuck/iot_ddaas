@@ -57,7 +57,7 @@ jobs:
         run: docker ps
 
       - name: Set enviroment variable for PostgreSQL
-        run: echo "SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-test-container:5433/ddaas_test" >> $GITHUB_ENV
+        run: echo "SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5433/ddaas_test" >> $GITHUB_ENV
 
       - name: Wait for PostgreSQL to start
         run:  |
