@@ -59,6 +59,13 @@ jobs:
       - name: Set enviroment variable for PostgreSQL
         run: echo "SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5433/ddaas_test" >> $GITHUB_ENV
 
+      - name: Print envitoment variables
+        run: printev | grep SPRING_DATASOURCE_URL
+
+      - name: Test database connection
+        run: |
+          docker exec -it $(docker ps -q --filter "expose=5433") psql -U postgres -d ddaas_test -c "SELECT 1;"
+
       - name: Check if PostgreSQL container is running
         run: docker ps | grep postgres-test-container
 
