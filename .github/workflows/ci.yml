@@ -56,6 +56,9 @@ jobs:
       - name: Run tests
         run: mvn test
 
+      - name: List files in target directory
+        run: ls -R target
+
       # Zamknięcie wszystkich kontenerów po zakończeniu testów pipeline
       - name: Stop Docker Compose
         run: docker-compose down
