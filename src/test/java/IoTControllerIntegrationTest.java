@@ -37,11 +37,6 @@ public class IoTControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @BeforeEach
-    void setUp(){
-
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-    }
 
     @Test
     void testGetAllData() throws Exception{
