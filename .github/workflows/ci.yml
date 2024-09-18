@@ -34,8 +34,7 @@ jobs:
 
     # Pobieranie kodu z repozytorium (Checkout code)
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+
 
       # Ustawienie środowiska JDK
       - name: Set up JDK 22
