@@ -42,6 +42,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '22'
+          distribution: 'temurin'
 
       # Budowanie aplikacji i uruchomienie testów. Wykonanie komendy Mavena mvn clean install
       - name: Build with Maven and run tests
