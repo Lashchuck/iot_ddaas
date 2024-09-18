@@ -47,7 +47,8 @@ jobs:
       - name: Install Docker Compose
         run: sudo apt-get update && sudo apt-get install docker-compose
 
-
+      - name: Check Docker version
+        run: docker --version
 
       - name: Start PostgreSQL service
         run: docker-compose up -d postgres
