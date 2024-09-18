@@ -46,7 +46,7 @@ jobs:
 
       # Budowanie aplikacji i uruchomienie testów. Wykonanie komendy Mavena mvn clean install
       - name: Build with Maven and run tests
-        run: mvn clean install
+        run: mvn clean install -DskipTests=false
 
       - name: Wait for PostgreSQL to be ready
         run:  |

@@ -15,6 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
@@ -43,6 +44,10 @@ public class IoTDataServiceIntegrationTest {
 
         try (Connection connection = dataSource.getConnection()) {
             Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT schema_name FROM information_schema.schemata;");
+            while (resultSet.next()) {
+                System.out.println("Existing schema: " + resultSet.getString("schema_name"));
+            }
             // Tworzenie schematu test_schema, jeśli jeszcze nie istnieje
             statement.execute("CREATE SCHEMA IF NOT EXISTS test_schema;");
             // Przypisanie search_path do test_schema
