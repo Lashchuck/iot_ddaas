@@ -1,0 +1,60 @@
+name: CI Pipeline
+
+# Uruchamianie pipeline
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+# Definiowanie środowiska, na którym uruchamiane są testy
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # Tworzenie kontenera PostgreSQL
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: 1234
+          POSTGRES_DB: ddaas
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres" 
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 5
+        volumes:
+          - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+
+    # Pobieranie kodu z repozytorium (Checkout code)
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Ustawienie środowiska JDK
+      - name: Set up JDK 22
+        uses: actions/setup-java@v3
+        with:
+          java-version: '22'
+
+      # Budowanie aplikacji i uruchomienie testów. Wykonanie komendy Mavena mvn clean install
+      - name: Build with Maven and run tests
+        run: mvn clean install
+
+      - name: Wait for PostgreSQL to be ready
+        run:  |
+          docker-compose exec postgres sh -c "until pg_isready -U postgres; do sleep 1; done"
+
+      # Uruchamianie testów aplikacji
+      - name: Run tests
+        run: mvn test
+
+      # Zamknięcie wszystkich kontenerów po zakończeniu testów pipeline
+      - name: Stop Docker Compose
+        run: docker-compose down

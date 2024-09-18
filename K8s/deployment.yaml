@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iot-anomaly-detection
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: iot-anomaly-detection
+  template:
+    metadata:
+      labels:
+        app: iot-anomaly-detection
+    spec:
+      containers:
+        - name: iot-anomaly-detection
+          image: your-registry/iot-anomaly-detection:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://host.docker.internal:5432/ddaas
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "1234"

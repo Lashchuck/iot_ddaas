@@ -1,0 +1,73 @@
+version: '4.34.1'
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: postgres-container
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: ddaas
+      TZ: Europe/Warsaw
+    ports:
+      - "5432:5432"
+    networks:
+      - my-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: iot-anomaly-detection
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5432/ddaas
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 1234
+      TZ: Europe/Warsaw
+
+    depends_on:
+      - postgres
+    networks:
+      - my-network
+
+  metabase_user1:
+      image: metabase/metabase
+      container_name: metabase-user1
+      environment:
+        - MB_DB_TYPE=postgres
+        - MB_DB_DBNAME=ddaas
+        - MB_DB_PORT=5432
+        - MB_DB_USER=postgres
+        - MB_DB_PASS=1234
+        - MB_DB_HOST=postgres
+        - TZ=Europe/Warsaw
+      ports:
+        - "3000:3000"
+      depends_on:
+        - postgres
+      networks:
+        - my-network
+
+  metabase_user2:
+        image: metabase/metabase
+        container_name: metabase-user2
+        environment:
+          - MB_DB_TYPE=postgres
+          - MB_DB_DBNAME=ddaas
+          - MB_DB_PORT=5432
+          - MB_DB_USER=postgres
+          - MB_DB_PASS=1234
+          - MB_DB_HOST=postgres
+          - TZ=Europe/Warsaw
+        ports:
+          - "3001:3000"
+        depends_on:
+          - postgres
+        networks:
+          - my-network
+
+networks:
+  my-network:
+    driver: bridge
