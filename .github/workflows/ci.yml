@@ -59,7 +59,8 @@ jobs:
       - name: Set enviroment variable for PostgreSQL
         run: echo "SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5433/ddaas_test" >> $GITHUB_ENV
 
-
+      - name: Print envitoment variables
+        run: printenv | grep SPRING_DATASOURCE_URL
 
       - name: Test database connection
         run: |
