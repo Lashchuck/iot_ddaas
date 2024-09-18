@@ -52,9 +52,23 @@ jobs:
         run:  |
           docker-compose exec postgres sh -c "until pg_isready -U postgres; do sleep 1; done"
 
+      - name: Check PostgreSQL logs
+        run: docker logs $(docker ps -q --filter "ancestor=postgres:13")
+
+      - name: Check if PostgreSQL container is running
+        run: docker ps | grep postgres
+
+      - name: Initialize database schema
+        run: |
+          docker exec -i $(docker ps -q --filter "ancestor=postgres:14") psql -U postgres -d ddaas -c "CREATE SCHEMA IF NOT EXISTS test_schema;"
+
       # Uruchamianie testów aplikacji
       - name: Run tests
         run: mvn test
+
+      - name: Verify test_schema creation
+        run: |
+          docker exec -i $(docker ps -q --filter "ancestor=postgres:14") psql -U postgres -d ddaas -c "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'test_schema';"
 
       - name: List files in target directory
         run: ls -R target
