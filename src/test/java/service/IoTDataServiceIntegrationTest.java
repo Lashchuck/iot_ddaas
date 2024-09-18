@@ -51,22 +51,6 @@ public class IoTDataServiceIntegrationTest {
             statement.execute("DROP TABLE IF EXISTS iotdata_test CASCADE;");
             statement.execute("DROP TABLE IF EXISTS anomaly_test CASCADE;");
             // Tworzenie tabel na podstawie encji
-            statement.execute("CREATE TABLE iotdata_test (" +
-                    "id SERIAL PRIMARY KEY, " +
-                    "device_id VARCHAR(255), " +
-                    "sensor1 INTEGER, " +
-                    "sensor2 INTEGER, " +
-                    "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
-                    "user_id BIGINT" +
-                    ");");
-            statement.execute("CREATE TABLE anomaly_test (" +
-                    "id SERIAL PRIMARY KEY, " +
-                    "device_id VARCHAR(255), " +
-                    "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
-                    "type VARCHAR(255), " +
-                    "user_id BIGINT, " +
-                    "wartosc INTEGER" +
-                    ");");
             System.out.println("Schema and tables created.");
         }
     }
