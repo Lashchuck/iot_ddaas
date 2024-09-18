@@ -59,6 +59,9 @@ jobs:
       - name: Set enviroment variable for PostgreSQL
         run: echo "SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5433/ddaas_test" >> $GITHUB_ENV
 
+      - name: Check if PostgreSQL container is running
+        run: docker ps | grep postgres-test-container
+
       - name: Wait for PostgreSQL to start
         run:  |
           echo "Waiting for PostgreSQL to be ready..."
@@ -70,8 +73,7 @@ jobs:
       - name: Check PostgreSQL logs
         run: docker logs $(docker ps -q --filter "ancestor=postgres:13")
 
-      - name: Check if PostgreSQL container is running
-        run: docker ps | grep postgres
+
 
       - name: Initialize database schema
         run: |
