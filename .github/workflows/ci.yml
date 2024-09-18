@@ -56,6 +56,9 @@ jobs:
       - name: List Docker containers
         run: docker ps
 
+      - name: Set enviroment variable for PostgreSQL
+        run: echo "SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-test-container:5433/ddaas_test" >> $GITHUB_ENV
+
       - name: Wait for PostgreSQL to start
         run:  |
           echo "Waiting for PostgreSQL to be ready..."
