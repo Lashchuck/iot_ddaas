@@ -47,9 +47,7 @@ public class IoTDataServiceIntegrationTest {
             statement.execute("CREATE SCHEMA IF NOT EXISTS test_schema;");
             // Przypisanie search_path do test_schema
             statement.execute("SET search_path TO test_schema;");
-            // Usunięcie tabel, jeśli istnieją
-            statement.execute("DROP TABLE IF EXISTS iotdata_test CASCADE;");
-            statement.execute("DROP TABLE IF EXISTS anomaly_test CASCADE;");
+
             // Tworzenie tabel na podstawie encji
             System.out.println("Schema and tables created.");
         }
