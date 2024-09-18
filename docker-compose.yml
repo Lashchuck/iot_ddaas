@@ -14,6 +14,19 @@ services:
     networks:
       - my-network
 
+  postgres-test:
+    image: postgres:13
+    container_name: postgres-test-container
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: ddaas_test
+      TZ: Europe/Warsaw
+    ports:
+      - "5433:5432"
+    networks:
+      - my-network
+
   app:
     build:
       context: .

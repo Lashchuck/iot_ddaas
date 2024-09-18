@@ -23,7 +23,7 @@ jobs:
           POSTGRES_PASSWORD: 1234
           POSTGRES_DB: ddaas
         ports:
-          - 5432:5432
+          - 5433:5432
         options: >-
           --health-cmd "pg_isready -U postgres" 
           --health-interval 10s 
