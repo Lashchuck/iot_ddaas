@@ -44,9 +44,14 @@ jobs:
           java-version: '22'
           distribution: 'temurin'
 
-      # Budowanie aplikacji i uruchomienie testów. Wykonanie komendy Mavena mvn clean install
-      - name: Build with Maven and run tests
-        run: mvn clean install -DskipTests=false
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
+
+      - name: Check Docker version
+        run: docker --version
 
       - name: Wait for PostgreSQL to be ready
         run:  |
@@ -61,6 +66,10 @@ jobs:
       - name: Initialize database schema
         run: |
           docker exec -i $(docker ps -q --filter "ancestor=postgres:14") psql -U postgres -d ddaas -c "CREATE SCHEMA IF NOT EXISTS test_schema;"
+
+      # Budowanie aplikacji i uruchomienie testów. Wykonanie komendy Mavena mvn clean install
+      - name: Build with Maven and run tests
+        run: mvn clean install -DskipTests=false
 
       # Uruchamianie testów aplikacji
       - name: Run tests
