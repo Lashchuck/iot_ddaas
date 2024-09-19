@@ -74,19 +74,13 @@ jobs:
           docker exec -i ${{ env.POSTGRES_CONTAINER_ID }} psql -U postgres -d ddaas_test -c "CREATE SCHEMA IF NOT EXISTS test_schema;"
 
       - name: Check PostgreSQL logs
-        run: docker logs postgres-container
-
-      - name: Test database connection
-        run: |
-          docker exec -it postgres-test-container psql -U postgres -d ddaas_test -c "SELECT 1;"
-
-      
+        run: docker logs ${{ env.POSTGRES_CONTAINER_ID }}
 
       - name: Wait for PostgreSQL to start
         run:  |
           echo "Waiting for PostgreSQL to be ready..."
           sleep 10
-          until pg_isready -h postgres-test-container -p 5433 -U postgres; do
+          until pg_isready -h localhost -p 5433 -U postgres; do
             sleep 1
           done
 
@@ -99,8 +93,7 @@ jobs:
         run: mvn test
 
       - name: Verify test_schema creation
-        run: |
-          docker exec -i $(docker ps -q --filter "ancestor=postgres:14") psql -U postgres -d ddaas -c "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'test_schema';"
+        run: docker exec -i ${{ env.POSTGRES_CONTAINER_ID }} psql -U postgres -d ddaas_test -c "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'test_schema';"
 
       - name: List files in target directory
         run: ls -R target
