@@ -22,13 +22,16 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: 1234
           POSTGRES_DB: ddaas_test
+        # Mapowanie portów PostgreSQL: 5433 na hoście, 5432 wewnątrz kontenera
         ports:
           - 5433:5432
+        # Sprawdzenie gotowości PostgreSQL, 10 s interwał między sprawdzeniami, 5 s timeout dla każdego sprawdzenia, 5 prób
         options: >-
-          --health-cmd "pg_isready -U postgres" 
+          --health-cmd "pg_isready -U postgres"
           --health-interval 10s 
           --health-timeout 5s 
           --health-retries 5
+        # Lokalne skrypty inicjalizujące
         volumes:
           - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
 
@@ -56,12 +59,14 @@ jobs:
       - name: List Docker containers
         run: docker ps -a
 
+      # Ustawienie zmiennej środowiskowej dla adresu URL
       - name: Set enviroment variable for PostgreSQL
         run: echo "SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5433/ddaas_test" >> $GITHUB_ENV
 
       - name: Print enviroment variables
         run: printenv | grep SPRING_DATASOURCE_URL
 
+      # Pobranie ID kontenera i zapis do zmiennej środowiskowej
       - name: Get PostgreSQL container ID
         id: get_container_id
         run: echo "POSTGRES_CONTAINER_ID=$(docker ps -q --filter 'publish=5433')" >> $GITHUB_ENV
@@ -69,6 +74,7 @@ jobs:
       - name: Check if PostgreSQL container is running
         run: docker exec -i ${{ env.POSTGRES_CONTAINER_ID }} psql -U postgres -d ddaas_test -c "SELECT 1;"
 
+      # Tworzenie schematu testowego
       - name: Initialize database schema
         run: |
           docker exec -i ${{ env.POSTGRES_CONTAINER_ID }} psql -U postgres -d ddaas_test -c "CREATE SCHEMA IF NOT EXISTS test_schema;"
@@ -95,6 +101,7 @@ jobs:
       - name: Verify test_schema creation
         run: docker exec -i ${{ env.POSTGRES_CONTAINER_ID }} psql -U postgres -d ddaas_test -c "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'test_schema';"
 
+      # Wyświetlenie listy plików (wyników) w katalogu target
       - name: List files in target directory
         run: ls -R target
 
@@ -102,6 +109,7 @@ jobs:
       - name: Stop Docker Compose
         run: docker-compose down
 
+      # Przesłanie raportów z testów do GitHub Actions
       - name: Upload test reports
         uses: actions/upload-artifact@v3
         with:
