@@ -64,12 +64,14 @@ jobs:
 
       - name: Get PostgreSQL container ID
         id: get_container_id
-        run: |
-          echo "POSTGRES_CONTAINER_ID=$(docker ps -q --filter 'expose=5433')" >> $GITHUB_ENV
+        run: echo "POSTGRES_CONTAINER_ID=$(docker ps -q --filter 'publish=5433')" >> $GITHUB_ENV
 
       - name: Check if PostgreSQL container is running
+        run: docker exec -i ${{ env.POSTGRES_CONTAINER_ID }} psql -U postgres -d ddaas_test -c "SELECT 1;"
+
+      - name: Initialize database schema
         run: |
-          docker exec -it $POSTGRES_CONTAINER_ID psql -U postgres -d ddaas_test -c "SELECT 1;"
+          docker exec -i ${{ env.POSTGRES_CONTAINER_ID }} psql -U postgres -d ddaas_test -c "CREATE SCHEMA IF NOT EXISTS test_schema;"
 
       - name: Check PostgreSQL logs
         run: docker logs postgres-container
@@ -87,14 +89,6 @@ jobs:
           until pg_isready -h postgres-test-container -p 5433 -U postgres; do
             sleep 1
           done
-
-      
-
-
-
-      - name: Initialize database schema
-        run: |
-          docker exec -i $(docker ps -q --filter "ancestor=postgres:14") psql -U postgres -d ddaas -c "CREATE SCHEMA IF NOT EXISTS test_schema;"
 
       # Budowanie aplikacji i uruchomienie testów. Wykonanie komendy Mavena mvn clean install
       - name: Build with Maven and run tests
