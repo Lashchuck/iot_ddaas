@@ -13,6 +13,9 @@ public interface AnomalyRepository extends JpaRepository<Anomaly, Long> {
 
     List<Anomaly> findByUserId(Long userId);
     Optional<Anomaly> findByIdAndUserId(Long id, Long userId);
+    Optional<Anomaly> findTopByDeviceIdOrderByTimestampDesc(String deviceId);
 
     boolean existsByTimestamp(LocalDateTime timestamp);
+
+
 }

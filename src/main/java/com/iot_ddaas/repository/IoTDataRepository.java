@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 public interface IoTDataRepository extends JpaRepository<IoTData, Long> {
 
     List<IoTData> findByUserId(Long userId);
+    List<IoTData> findByUserIdAndTimestampBetween(Long userId, LocalDateTime startDate, LocalDateTime endDate);
     Optional<IoTData> findByIdAndUserId(Long id, Long userId);
 
     @Modifying

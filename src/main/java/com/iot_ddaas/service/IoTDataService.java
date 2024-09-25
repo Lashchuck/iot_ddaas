@@ -20,12 +20,12 @@ public class IoTDataService {
     @Autowired
     private AnomalyRepository anomalyRepository;
 
-    public List<IoTData> getAllData() {
-        return dataRepository.findAll();
+    public List<IoTData> getAllData(Long userId) {
+        return dataRepository.findByUserId(userId);
     }
 
-    public Optional<IoTData> getDataById(Long id) {
-        return dataRepository.findById(id);
+    public Optional<IoTData> getDataById(Long id, Long userId) {
+        return dataRepository.findByIdAndUserId(id, userId);
     }
 
     public void saveData(IoTData data) {

@@ -19,7 +19,9 @@ public class IoTData {
 
     @PrePersist
     protected void onCreate() {
+
         timestamp = LocalDateTime.now();
+        lastRead = LocalDateTime.now();
     }
 
     public IoTData(){}
@@ -27,6 +29,15 @@ public class IoTData {
     public IoTData(Long id, String deviceId, Integer sensor1, Integer sensor2, Long userId, Float temperatureSensor, LocalDateTime lastRead){
 
         this.id = id;
+        this.deviceId = deviceId;
+        this.sensor1 = sensor1;
+        this.sensor2 = sensor2;
+        this.userId = userId;
+        this.temperatureSensor = temperatureSensor;
+        this.lastRead = lastRead;
+    }
+
+    public IoTData(String deviceId, Integer sensor1, Integer sensor2, Long userId, Float temperatureSensor, LocalDateTime lastRead) {
         this.deviceId = deviceId;
         this.sensor1 = sensor1;
         this.sensor2 = sensor2;

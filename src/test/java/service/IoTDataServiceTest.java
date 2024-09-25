@@ -46,19 +46,18 @@ public class IoTDataServiceTest {
     // Sprawdzenie, czy metoda prawidłowo zwraca dane
     @Test
     void testGetAllData(){
-
         // Tworzenie listy mockowanych danych IoTData
         List<IoTData> mockData = List.of(
                 new IoTData(1L, "ESP-32-moisture-sensors", 20, 30, 1L, null, null),
                 new IoTData(2L, "ESP8266-temperature-sensor", null, null, 2L, 20.0f, null)
         );
-        when(dataRepository.findAll()).thenReturn(mockData);
+        when(dataRepository.findByUserId(1L)).thenReturn(mockData);
 
-        List<IoTData> result = ioTDataService.getAllData();
+        List<IoTData> result = ioTDataService.getAllData(1L);
         // Sprawdzenie czy rozmiar listy to 2
         assertEquals(2, result.size());
         // Weryfikacja, że metoda findAll() została wywołana raz
-        verify(dataRepository, times(1)).findAll();
+        verify(dataRepository, times(1)).findByUserId(1L);
     }
 
     // Sprawdzenie czy metoda poprawnie zwraca dane na podstawie ID
@@ -68,10 +67,10 @@ public class IoTDataServiceTest {
         // Tworzenie mockowanych danych IoTData
         IoTData mockData = new IoTData(1L, "ESP-32-moisture-sensors", 20, 30, 1L, null, null);
         // Konfiguracja mock reporyzotrium, aby zwracało dane, gdy findById(1L) zostanie wywołane.
-        when(dataRepository.findById(1L)).thenReturn(Optional.of(mockData));
+        when(dataRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.of(mockData));
 
-        // Wywołanie getDataById(1L) i sprawdzenie czy dane są obecne i mają oczekiwany deviceId
-        Optional<IoTData> result = ioTDataService.getDataById(1L);
+        // Wywołanie getDataById i sprawdzenie czy dane są obecne i mają oczekiwany deviceId
+        Optional<IoTData> result = ioTDataService.getDataById(1L, 1L);
         assertTrue(result.isPresent());
         assertEquals("ESP-32-moisture-sensors", result.get().getDeviceId());
     }
