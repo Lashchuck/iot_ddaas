@@ -2,7 +2,7 @@
 
 **Project Description**
 
-The goal of this project is to develop a system for detecting and analyzing anomalies in data collected from IoT devices. The system gathers data from microcontrollers (ESP32 - 2 soil moisture sensors, ESP8266 - temperature sensor),  identifies anomalies, and generates reports and notifications. Project is useful for detecting irregularities such as device malfunctions, environmental changes, or suspicious activity, making it ideal for monitoring IoT infrastructures.
+The IoT Data Detection and Anomaly System (DDAAS) is designed to collect, analyze, and detect anomalies in real-time data from IoT devices. The system gathers data from microcontrollers (ESP32 - 2 soil moisture sensors, ESP8266 - temperature sensor),  identifies anomalies, and generates reports and notifications. Project is useful for detecting irregularities such as device malfunctions, environmental changes, or suspicious activity, making it ideal for monitoring IoT infrastructures.
 
 
 ## Technologies
