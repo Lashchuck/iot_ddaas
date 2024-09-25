@@ -64,5 +64,5 @@ The goal of this project is to develop a system for detecting and analyzing anom
     - Testing the operation and functionality of the API controller (IoTController) and the correctness of HTTP responses.
 - **GitHub Actions:** Automated testing via CI/CD.
 
-## 🔗 Link to microcontrollers codes
+## 🔗 Link to microcontroller codes
 [![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Lashchuck/iot_ddaas_iot_devices)
