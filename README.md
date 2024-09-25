@@ -4,6 +4,7 @@
 
 The goal of this project is to develop a system for detecting and analyzing anomalies in data collected from IoT devices. The system gathers data from microcontrollers (ESP32 - 2 soil moisture sensors, ESP8266 - temperature sensor),  identifies anomalies, and generates reports and notifications. Project is useful for detecting irregularities such as device malfunctions, environmental changes, or suspicious activity, making it ideal for monitoring IoT infrastructures.
 
+
 ## Technologies
 
 **Backend (Spring Boot)**
@@ -21,7 +22,7 @@ The goal of this project is to develop a system for detecting and analyzing anom
 - **JWT Authentication:** Secure user authentication and session management.
 - **Axios:** For making HTTP requests to the backend API.
 - **Material-UI (MUI):** UI component library for building responsive, modern user interfaces.
----------
+
 
 ## System Features
 
