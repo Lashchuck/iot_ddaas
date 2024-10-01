@@ -62,6 +62,9 @@ The IoT Data Detection and Anomaly System (DDAAS) is designed to collect, analyz
 
     - Testing logic at the service layer (repositories). Testing operations for writing and reading data from tables in the database.
     - Testing the operation and functionality of the API controller (IoTController) and the correctness of HTTP responses.
+    - Testing login functionality: Verifies successful login, checking the response for a valid token and user details, and confirms correct password storage in the database.
+    - Testing failed login with invalid email: Ensures login fails when an incorrect email is provided, returning the appropriate error message.
+    - Testing access to protected resources: Confirms that a valid JWT token allows access to a protected endpoint by performing an authenticated GET request.
 - **GitHub Actions:** Automated testing via CI/CD.
 
 ## 🔗 Link to microcontroller codes
