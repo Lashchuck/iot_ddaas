@@ -187,6 +187,7 @@
 			<artifactId>jjwt-jackson</artifactId> <!-- Używane do obsługi JSON w JWT -->
 			<version>0.11.5</version>
 		</dependency>
+
 	</dependencies>
 
 	<build>

@@ -1,5 +1,7 @@
 package com.iot_ddaas;
 
+import com.iot_ddaas.frontend.auth.CustomUserDetails;
+import com.iot_ddaas.frontend.auth.User;
 import com.iot_ddaas.sensors.Sensor;
 import com.iot_ddaas.sensors.SoilMoistureSensor;
 import com.iot_ddaas.sensors.TemperatureSensor;
@@ -7,15 +9,18 @@ import com.iot_ddaas.repository.AnomalyRepository;
 import com.iot_ddaas.repository.IoTDataRepository;
 import com.iot_ddaas.service.EmailService;
 
+import com.iot_ddaas.service.UserService;
 import jakarta.mail.MessagingException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -39,13 +44,23 @@ public class IoTController {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private UserService userService;
+
     private final Set<String> notifiedDevices = new HashSet<>();
     private boolean isFirstRun = true;
 
     // Pobieranie wszystkich danych tylko dla danego użytkownika.
     // Endpoint zwraca listę danych IoT dla danego użytkownika na podstawie przekazanego userId
     @GetMapping("/data")
-    public List<IoTData> getAllData(@AuthenticationPrincipal Long userId) {
+    public List<IoTData> getAllData(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+
+        if (customUserDetails == null){
+            throw new RuntimeException("User is not authenticated");
+        }
+        
+        Long userId = customUserDetails.getId();
+        System.out.println("Zwracany userId: " + userId);
         return dataRepository.findByUserId(userId);
     }
 
@@ -113,6 +128,18 @@ public class IoTController {
         }
 
         data.setUserId(userId);
+        log.info("Otrzymane dane: " + data);
+
+        if (data.getSensor1() != null) {
+            log.info("Czujnik 1: " + data.getSensor1());
+        }
+        if (data.getSensor2() != null) {
+            log.info("Czujnik 2: " + data.getSensor2());
+        }
+        if (data.getTemperatureSensor() != null) {
+            log.info("Czujnik temperatury: " + data.getTemperatureSensor());
+        }
+
         dataRepository.save(data);
         dataRepository.updateLastRead(data.getDeviceId(), data.getTimestamp());
         detectAnomalies(data);
@@ -228,7 +255,6 @@ public class IoTController {
             log.warn("Brak odczytu wilgotności, awaria.");
             createAndNotifyAnomaly(sensor, "Awaria mikrokontrolera lub czujników wilgotności gleby, brak odczytu.", userId);
         }else {
-            log.info("Czujnik: " + sensor.getMoistureValue());
             if (sensor.detectAnomaly(10)){
                 createAndNotifyAnomaly(sensor, "Czujnik", userId);
             }
@@ -246,7 +272,6 @@ public class IoTController {
             log.warn("Brak odczytu temperatury, awaria.");
             createAndNotifyAnomaly(temperatureSensor, "Awaria czujnika temperatury, brak odczytu.", userId);
         } else {
-            log.info("Temperatura: " + data.getTemperatureSensor());
             if (temperatureSensor.detectAnomaly(40)) {
                 createAndNotifyAnomaly(temperatureSensor, "Czujnik temperatury", userId);
             }
@@ -258,5 +283,4 @@ public class IoTController {
         anomalyRepository.save(anomaly);
         sendAnomalyNotification(userId, sensor.getDeviceId(), message);
     }
-
 }

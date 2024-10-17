@@ -9,10 +9,27 @@ instance.interceptors.request.use(
         const token = localStorage.getItem('token');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
+            console.log('Authorization header:', config.headers.Authorization);
+        }else{
+            console.log('No token found in localStorage');
         }
         return config;
     },
-    (error) => Promise.reject(error)
+    (error) => {
+        console.error('Request error:',error);
+        return Promise.reject(error);
+    }
+);
+
+instance.interceptors.response.use(
+    (response) => {
+        console.log('Response data:', response.data);
+        return response;
+    },
+    (error) => {
+        console.error('Response error', error.response ? error.response.data : error.message);
+        return Promise.reject(error);
+    }
 );
 
 export default instance;

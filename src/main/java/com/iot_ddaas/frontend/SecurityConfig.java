@@ -25,6 +25,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("auth/**").permitAll() // Zezwolenie na dostęp endpointów auth
+                        .requestMatchers("/iot/data").authenticated()
                         .anyRequest().authenticated() // Logowanie dla reszty zasobów
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

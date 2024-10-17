@@ -66,7 +66,7 @@ public class IoTDataServiceIntegrationTest {
     }
 
     @Test
-    void testSaveAndRetrieveData(){
+    void shouldSaveAndRetrieveDataSuccessfully(){
 
         // Zapis i odczyt danych
         IoTData data = new IoTData(null, "ESP-32-moisture-sensors", 20, 30, 1L, null, null);
@@ -78,7 +78,7 @@ public class IoTDataServiceIntegrationTest {
     }
 
     @Test
-    void testSaveAndRetrieveAnomaly(){
+    void shouldSaveAndRetrieveAnomalySuccessfully(){
 
         Anomaly anomaly = new Anomaly(null, "ESP8266-temperature-sensor", null, "Awaria", 1L, null);
         anomalyRepository.save(anomaly);

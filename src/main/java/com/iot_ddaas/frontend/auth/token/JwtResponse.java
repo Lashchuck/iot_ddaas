@@ -5,11 +5,15 @@ import com.iot_ddaas.frontend.auth.UserDto;
 public class JwtResponse {
 
     private String token;
-    private UserDto user;
+    private Long id;
+    private String username;
+    private String email;
 
-    public JwtResponse(String token, UserDto user) {
+    public JwtResponse(String token, Long id, String username, String email) {
         this.token = token;
-        this.user = user;
+        this.id = id;
+        this.username = username;
+        this.email = email;
     }
 
     public String getToken() {
@@ -20,11 +24,15 @@ public class JwtResponse {
         this.token = token;
     }
 
-    public UserDto getUser() {
-        return user;
+    public Long getId() {
+        return id;
     }
 
-    public void setUser(UserDto user) {
-        this.user = user;
+    public String getUsername() {
+        return username;
+    }
+
+    public String getEmail() {
+        return email;
     }
 }

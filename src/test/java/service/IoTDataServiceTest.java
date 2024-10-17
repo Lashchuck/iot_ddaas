@@ -45,7 +45,7 @@ public class IoTDataServiceTest {
 
     // Sprawdzenie, czy metoda prawidłowo zwraca dane
     @Test
-    void testGetAllData(){
+    void shouldReturnTwoRecordsAndInvokeFindByUserIdOnce(){
         // Tworzenie listy mockowanych danych IoTData
         List<IoTData> mockData = List.of(
                 new IoTData(1L, "ESP-32-moisture-sensors", 20, 30, 1L, null, null),
@@ -62,7 +62,7 @@ public class IoTDataServiceTest {
 
     // Sprawdzenie czy metoda poprawnie zwraca dane na podstawie ID
     @Test
-    void testGetDataById(){
+    void shouldReturnDataWithCorrectDeviceIdById(){
 
         // Tworzenie mockowanych danych IoTData
         IoTData mockData = new IoTData(1L, "ESP-32-moisture-sensors", 20, 30, 1L, null, null);
@@ -77,7 +77,7 @@ public class IoTDataServiceTest {
 
     // Sprawdzenie czy saveData() zapisuje dane i nie wywołuje zapisywania anomalii.
     @Test
-    void testSaveData(){
+    void shouldInvokeDataRepositoryOnceAndNotInvokeAnomalyRepository(){
 
         IoTData mockData = new IoTData(1L, "ESP-32-moisture-sensors", 20, 30, 1L, null, null);
 
@@ -92,7 +92,7 @@ public class IoTDataServiceTest {
 
     // Sprawdzenie czy deleteData() poprawnie usuwa dane na podstawie ID.
     @Test
-    void testDeleteData() {
+    void shouldInvokeDeleteByIdOnceWhenDeletingData() {
 
         Long dataId = 1L;
 
@@ -104,7 +104,7 @@ public class IoTDataServiceTest {
 
     // Sprawdzenie czy metoda prawidłowo zwraca listę anomalii.
     @Test
-    void testGetAllAnomalies() {
+    void shouldReturnTwoAnomaliesAndInvokeFindAllOnce() {
 
         // Tworzenie listy mockowanych anomalii
         List<Anomaly> mockAnomalies = Arrays.asList(new Anomaly(), new Anomaly());
@@ -117,7 +117,7 @@ public class IoTDataServiceTest {
 
     // Sprawdzenie czy deleteAnomaly() poprawnie usuwa anomalię na podstawie ID.
     @Test
-    void testDeleteAnomaly(){
+    void shouldInvokeDeleteAnomalyByIdOnce(){
 
         Long anomalyId = 1L;
         ioTDataService.deleteAnomaly(anomalyId);
