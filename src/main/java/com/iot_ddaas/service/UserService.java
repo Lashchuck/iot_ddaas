@@ -7,11 +7,15 @@ import com.iot_ddaas.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.List;
 
 
 @Service
@@ -31,6 +35,7 @@ public class UserService implements UserDetailsService {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         logger.info("UserService initialized with PasswordEncoder: {}", passwordEncoder);
+        System.out.println("UserRepository injected: " + (userRepository !=null));
     }
 
     public User save(User user){
@@ -53,9 +58,12 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findByEmail(username);
         if (user == null){
             logger.error("Użytkownik {} nie został znaleziony", username);
-            throw new UsernameNotFoundException("Użytkownik nie został znaleziony");
+            throw new UsernameNotFoundException("User not found: " + username);
         }
-        logger.info("Znaleziony użytkownik: {}", user.getUsername());
+        logger.info("Userfound: {}", user);
+
+        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList("ROLE_USER");
+        System.out.println("Granted authorities for user: " + authorities);
         return new CustomUserDetails(user);
     }
 
@@ -89,12 +97,14 @@ public class UserService implements UserDetailsService {
     }
 
     public User findByEmail(String email){
+        System.out.println("Searching for user with email: " + email);
         logger.info("Wykonuję zapytanie do bazy danych o użytkownika z emailem: {}", email);
         return userRepository.findByEmail(email);
     }
 
     public User findUserByEmailOrThrow(String email){
         User user = userRepository.findByEmail(email);
+        System.out.println("Searching for user with email: " + email);
         if (user == null){
             throw new UserNotFoundException("Użytkownik o podanym adresie email nie został znaleziony");
         }

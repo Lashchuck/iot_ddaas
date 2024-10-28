@@ -1,50 +1,37 @@
+package auth;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iot_ddaas.Main;
-import com.iot_ddaas.frontend.auth.LoginRequest;
-import com.iot_ddaas.frontend.auth.User;
-import com.iot_ddaas.frontend.auth.token.JwtTokenProvider;
+import com.iot_ddaas.frontend.auth.*;
+import com.iot_ddaas.frontend.auth.token.JwtAuthenticationFilter;
 import com.iot_ddaas.repository.UserRepository;
-import com.iot_ddaas.service.UserService;
-
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import org.mockito.MockitoAnnotations;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-
 
 @SpringBootTest(classes = Main.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class AuthControllerTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(AuthControllerTest.class);
+public class LoginTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     private UserRepository userRepository;
@@ -52,10 +39,25 @@ public class AuthControllerTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @BeforeEach
-    @Rollback
-    void setUp(){
-        MockitoAnnotations.openMocks(this);
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Test
+    public void shouldFindUserByEmail(){
+        User user = new User();
+        user.setEmail("test@gmail.com");
+        user.setPassword("password");
+        user.setUsername("testuser");
+        user.setRole("ROLE_USER");
+        userRepository.save(user);
+
+        User foundUser = userRepository.findByEmail("test@gmail.com");
+        assertNotNull(foundUser); // Sprawdzanie czy użytkownik został znaleziony
+        assertEquals("test@gmail.com", foundUser.getEmail()); // Sprawdzanie email
+        userRepository.delete(user);
     }
 
     @Test
@@ -65,13 +67,11 @@ public class AuthControllerTest {
         String email = "test@gmail.com";
         String rawPassword = "password";
 
-        User mockUser = new User();
-        mockUser.setId(1L);
-        mockUser.setEmail(email);
-        mockUser.setPassword(passwordEncoder.encode(rawPassword)); // Zaszyfrowane hasło
-        mockUser.setUsername("user");
-
-        userRepository.save(mockUser);
+        User user = new User();
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(rawPassword)); // Zaszyfrowane hasło
+        user.setUsername("user");
+        userRepository.save(user);
 
         // Przygotowanie LoginRequest
         LoginRequest loginRequest = new LoginRequest();
@@ -87,24 +87,29 @@ public class AuthControllerTest {
                         .content(loginRequestJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").exists())
-                .andExpect(jsonPath("$.user.id").value(1L))
+                .andExpect(jsonPath("$.user.id").value(user.getId()))
                 .andExpect(jsonPath("$.user.email").value(email));
-
 
         User userFromDb = userRepository.findByEmail(email);
         assertNotNull(userFromDb);
         assertEquals(email, userFromDb.getEmail());
         assertTrue(passwordEncoder.matches(rawPassword, userFromDb.getPassword()));
+
+        userRepository.delete(user);
+        userRepository.delete(userFromDb);
     }
 
     @Test
     @Transactional
     public void shouldFailLoginWithInvalidEmail() throws Exception{
 
+        String email = "invalid_email@gmail.com";
+        String password = "password";
+
         // Przygotowywanie LoginRequest dla nieprawidłowego emaila
         LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setEmail("invalid_email@gmail.com");
-        loginRequest.setPassword("password");
+        loginRequest.setEmail(email);
+        loginRequest.setPassword(password);
 
         ObjectMapper objectMapper = new ObjectMapper();
         String loginRequestedJson = objectMapper.writeValueAsString(loginRequest);
@@ -116,49 +121,4 @@ public class AuthControllerTest {
                 .andExpect(status().isUnauthorized()) // Sprawdzanie że odpowiedź HTTP ma status 401 Unauthorized
                 .andExpect(jsonPath("$.message").value("Nieprawidłowy email lub hasło"));
     }
-
-/*
-    @Test
-    @Transactional
-    public void testAccessProtectedResource() throws Exception{
-
-        String email = "test@gmail.com";
-        String rawPassword = "password";
-
-        User mockUser = new User();
-        mockUser.setId(1L);
-        mockUser.setEmail(email);
-        mockUser.setPassword(passwordEncoder.encode(rawPassword)); // Zaszyfrowane hasło
-        mockUser.setUsername("user");
-
-        userRepository.save(mockUser);
-
-        LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setEmail(email);
-        loginRequest.setPassword(rawPassword);
-
-        // Wykonanie żądania POST do endpointa logowania, aby uzyskać token JWT
-        ObjectMapper objectMapper = new ObjectMapper();
-        String loginRequestJson = objectMapper.writeValueAsString(loginRequest);
-
-        String jwtToken = mockMvc.perform(post("/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(loginRequestJson))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").exists())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        JsonNode jsonResponse = objectMapper.readTree(jwtToken);
-        String token = jsonResponse.get("token").asText();
-        System.out.println("JWT Token: " + token);
-
-        // Wykonanie żądania GET do chronionego zasobu tokenem JWT
-        mockMvc.perform(get("/iot/data")
-                .header("Authorization", "Bearer " + token)) // Dodanie tokena do nagłówków
-                .andExpect(status().isOk());
-    }
-
- */
 }

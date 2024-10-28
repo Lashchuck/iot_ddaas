@@ -187,7 +187,22 @@
 			<artifactId>jjwt-jackson</artifactId> <!-- Używane do obsługi JSON w JWT -->
 			<version>0.11.5</version>
 		</dependency>
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>7.0.0.Final</version> <!-- Użyj najnowszej wersji -->
+		</dependency>
 
+		<dependency>
+			<groupId>jakarta.validation</groupId>
+			<artifactId>jakarta.validation-api</artifactId>
+			<version>3.0.0</version> <!-- Użyj wersji zgodnej z Hibernate Validator -->
+		</dependency>
+		<dependency>
+			<groupId>jakarta.el</groupId>
+			<artifactId>jakarta.el-api</artifactId>
+			<version>4.0.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>

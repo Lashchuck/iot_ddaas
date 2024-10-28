@@ -1,7 +1,7 @@
 package com.iot_ddaas;
 
 import com.iot_ddaas.frontend.auth.CustomUserDetails;
-import com.iot_ddaas.frontend.auth.User;
+import com.iot_ddaas.frontend.auth.token.JwtAuthenticationFilter;
 import com.iot_ddaas.sensors.Sensor;
 import com.iot_ddaas.sensors.SoilMoistureSensor;
 import com.iot_ddaas.sensors.TemperatureSensor;
@@ -13,27 +13,26 @@ import com.iot_ddaas.service.UserService;
 import jakarta.mail.MessagingException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import java.util.Collections;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/iot")
 public class IoTController {
 
     private static final Log log = LogFactory.getLog(IoTController.class);
+    private static final Logger logger = LoggerFactory.getLogger(IoTController.class);
 
     @Autowired
     private IoTDataRepository dataRepository;
@@ -53,20 +52,46 @@ public class IoTController {
     // Pobieranie wszystkich danych tylko dla danego użytkownika.
     // Endpoint zwraca listę danych IoT dla danego użytkownika na podstawie przekazanego userId
     @GetMapping("/data")
-    public List<IoTData> getAllData(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ResponseEntity<List<IoTData>> getAllData(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        if (customUserDetails == null){
-            throw new RuntimeException("User is not authenticated");
+        Long userId = (customUserDetails !=null) ? customUserDetails.getId() :  null;
+        System.out.println("CustomUserDetails: " + customUserDetails);
+/*
+        if (customUserDetails != null){
+            userId = customUserDetails.getId();
+            logger.info("UserId from CustomUserDetails: {}", userId);
+            logger.info("Current user: {}", customUserDetails.getEmail());
+        }else {
+            logger.warn("CustomUserDetails is null. Fetching all data for unauthorized access.");
         }
-        
-        Long userId = customUserDetails.getId();
-        System.out.println("Zwracany userId: " + userId);
-        return dataRepository.findByUserId(userId);
+        */
+
+/*
+        if (customUserDetails == null){
+            logger.warn("CustomUserDetails is null.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.emptyList());
+        }
+  */
+        logger.info("Fetching data for userId: {}", userId);
+        List<IoTData> data;
+
+        if (userId != null){
+            data = dataRepository.findByUserId(userId);
+        }else {
+            data = dataRepository.findAll();
+        }
+
+        logger.info("Fetched data size: {}", data.size());
+        logger.info("Fetched data content: {}", data);
+
+        return ResponseEntity.ok(data);
     }
 
     // Pobieranie konkretnej wartości z tabeli iotdata na podstawie id i userId
     @GetMapping("/data/{id}")
-    public ResponseEntity<IoTData> getDataById(@PathVariable Long id, @AuthenticationPrincipal Long userId) {
+    public ResponseEntity<IoTData> getDataById(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        Long userId = customUserDetails.getId();
         Optional<IoTData> data = dataRepository.findByIdAndUserId(id, userId);
         return data.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
@@ -128,6 +153,7 @@ public class IoTController {
         }
 
         data.setUserId(userId);
+        data.setTimestamp(LocalDateTime.now());
         log.info("Otrzymane dane: " + data);
 
         if (data.getSensor1() != null) {

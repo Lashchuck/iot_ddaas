@@ -19,6 +19,7 @@ public class User {
     private String username;
     private String email;
     private String password;
+    @Column(name = "role")
     private String role;
 
 
@@ -78,5 +79,4 @@ public class User {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role)); // Użycie roli jako String
     }
-
 }

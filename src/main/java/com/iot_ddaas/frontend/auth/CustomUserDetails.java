@@ -10,12 +10,11 @@ import java.util.List;
 
 public class CustomUserDetails implements UserDetails {
 
-    private User user; // Przechowujemy użytkownika
+    private final User user; // Przechowujemy użytkownika
 
     public CustomUserDetails(User user) {
         this.user = user;
     }
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -29,7 +28,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getUsername();
+        return user.getEmail();
     }
 
     @Override
@@ -54,5 +53,13 @@ public class CustomUserDetails implements UserDetails {
 
     public Long getId() {
         return user.getId(); // Możliwość uzyskania ID użytkownika
+    }
+
+    public String getEmail(){
+        return user.getEmail();
+    }
+
+    public User getUser(){
+        return user;
     }
 }

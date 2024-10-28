@@ -3,6 +3,7 @@ package com.iot_ddaas.frontend.auth;
 import com.github.dockerjava.api.model.AuthResponse;
 import com.iot_ddaas.frontend.auth.token.JwtResponse;
 import com.iot_ddaas.frontend.auth.token.JwtTokenProvider;
+import com.iot_ddaas.repository.UserRepository;
 import com.iot_ddaas.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,9 @@ public class AuthController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private UserRepository userRepository;
+
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody UserDto userDto){
@@ -41,7 +45,16 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest loginRequest){
+
+        User user = userRepository.findByEmail(loginRequest.getEmail());
         Map<String, Object> response = new HashMap<>();
+        if (user == null){
+            response.put("message", "Nieprawidłowy email lub hasło");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }else {
+            System.out.println("User role: " + user.getRole());
+        }
+
         try {
             // Wywołanie serwisu w celu zalogowania użytkownika
             UserDto userDto = userService.loginUser(loginRequest);
