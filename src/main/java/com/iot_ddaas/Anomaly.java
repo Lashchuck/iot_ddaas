@@ -2,6 +2,7 @@ package com.iot_ddaas;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Entity
 public class Anomaly {
@@ -23,7 +24,7 @@ public class Anomaly {
 
         this.id = id;
         this.deviceId = deviceId;
-        this.timestamp = timestamp;
+        this.timestamp = timestamp.truncatedTo(ChronoUnit.SECONDS);
         this.type = type;
         this.userId = userId;
         this.wartosc = wartosc;
@@ -68,7 +69,7 @@ public class Anomaly {
     }
 
     public void setTimestamp(LocalDateTime timestamp){
-        this.timestamp=timestamp;
+        this.timestamp=timestamp.truncatedTo(ChronoUnit.SECONDS);
     }
 
     public Long getUserId(){

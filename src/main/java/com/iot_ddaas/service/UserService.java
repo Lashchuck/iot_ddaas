@@ -47,10 +47,15 @@ public class UserService implements UserDetailsService {
         User user = new User();
         user.setUsername(userDto.getUsername());
         user.setEmail(userDto.getEmail());
+        logger.info("Hasło przed szyfrowaniem: {}", userDto.getPassword());
         // Szyfrowanie hasła przed zapisem w bazie
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        logger.info("Hasło po szyfrowaniu: {}", user.getPassword());
+        user.setRole("USER");
         // Zapis użytkownika w bazie danych
         userRepository.save(user);
+        logger.info("Zarejestrowano nowego użytkownika: {}", user.getEmail());
+        logger.info("Zarejestrowane hasło użytkownika: {}", user.getPassword());
     }
 
     @Override
@@ -70,28 +75,27 @@ public class UserService implements UserDetailsService {
 
     public UserDto loginUser(LoginRequest loginRequest){
         logger.info("Próba logowania użytkownika z email: {}", loginRequest.getEmail());
+
         // Znalezienie użytkownika po emailu
         User user = userRepository.findByEmail(loginRequest.getEmail());
-
-
         // Sprawdzanie czy użytkownik istnieje i czy podane hasło jest poprawne
         if (user == null){
             logger.warn("Użytkownik nie znaleziony: {}", loginRequest.getEmail());
             // Jeśli dane są poprawne zostaje zwracane DTO bez hasła
             throw new UserNotFoundException("Nieprawidłowy email lub hasło");
-        }else {
-            logger.info("Znaleziono użytkownika: {}", user.getEmail());
         }
 
-        if (passwordEncoder == null){
-            logger.error("PasswordEncoder is null");
-            throw new UserNotFoundException("PasswordEncoder nie został zainicjalozowany");
-        }
+        logger.info("Znaleziono użytkownika: {}", user.getEmail());
+        logger.info("Hasło zapisane w bazie: {}", user.getPassword());
 
+        boolean isPasswordCorrect = passwordEncoder.matches(loginRequest.getPassword(), user.getPassword());
+        logger.info("Porównanie hasła: {}", isPasswordCorrect);
+        logger.info("Sprawdzanie hasła: podane={}, zapisane={}, wynik={}", loginRequest.getPassword(), user.getPassword(), isPasswordCorrect);
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())){
             logger.warn("Nieprawidłowe hasło dla użytkownika: {}", loginRequest.getEmail());
             throw new UserNotFoundException("Nieprawidłowy email lub hasło");
         }
+
         logger.info("Użytkownik zalogowany pomyślnie: {}", user.getUsername());
         return new UserDto(user.getId(), user.getUsername(), user.getEmail());
     }

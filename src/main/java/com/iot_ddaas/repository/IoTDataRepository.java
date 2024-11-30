@@ -20,6 +20,7 @@ public interface IoTDataRepository extends JpaRepository<IoTData, Long> {
     List<IoTData> findByUserIdAndTimestampBetween(Long userId, LocalDateTime startDate, LocalDateTime endDate);
     Optional<IoTData> findByIdAndUserId(Long id, Long userId);
     List<IoTData> findAll();
+    List<IoTData> findByUserIdAndTimestampAfter(Long userId, LocalDateTime timestamp);
 
     @Modifying
     @Transactional

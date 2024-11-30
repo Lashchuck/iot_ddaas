@@ -6,16 +6,14 @@ import com.iot_ddaas.frontend.auth.*;
 import com.iot_ddaas.frontend.auth.token.JwtAuthenticationFilter;
 import com.iot_ddaas.repository.UserRepository;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -58,6 +56,19 @@ public class LoginTest {
         assertNotNull(foundUser); // Sprawdzanie czy użytkownik został znaleziony
         assertEquals("test@gmail.com", foundUser.getEmail()); // Sprawdzanie email
         userRepository.delete(user);
+    }
+
+    @Test
+    public void shouldEncodePasswordAndMatchRawPassword(){
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+        String rawPassword = "1234";
+        String encodedPassword = passwordEncoder.encode(rawPassword);
+
+        System.out.println("Raw password: " + rawPassword);
+        System.out.println("Encoded password: " + encodedPassword);
+
+        assertTrue(passwordEncoder.matches(rawPassword, encodedPassword), "Password should match");
     }
 
     @Test

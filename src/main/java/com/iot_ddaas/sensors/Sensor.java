@@ -2,6 +2,7 @@ package com.iot_ddaas.sensors;
 import com.iot_ddaas.Anomaly;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 public abstract class Sensor {
 
@@ -13,7 +14,7 @@ public abstract class Sensor {
         Anomaly anomaly = new Anomaly();
         anomaly.setDeviceId(this.deviceId);
         anomaly.setType(type);
-        anomaly.setTimestamp(LocalDateTime.now());
+        anomaly.setTimestamp(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         return anomaly;
     }
 
@@ -30,7 +31,7 @@ public abstract class Sensor {
     }
 
     public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
+        this.timestamp = timestamp.truncatedTo(ChronoUnit.SECONDS);
     }
 
     public Long getUserId() {

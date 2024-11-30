@@ -2,6 +2,7 @@ package com.iot_ddaas;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Entity
 
@@ -19,8 +20,8 @@ public class IoTData {
 
     @PrePersist
     protected void onCreate() {
-        timestamp = LocalDateTime.now();
-        lastRead = LocalDateTime.now();
+        timestamp = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        lastRead = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
 
     public IoTData(){}
@@ -33,7 +34,7 @@ public class IoTData {
         this.sensor2 = sensor2;
         this.userId = userId;
         this.temperatureSensor = temperatureSensor;
-        this.lastRead = lastRead;
+        this.lastRead = lastRead.truncatedTo(ChronoUnit.SECONDS);
     }
 
     public IoTData(String deviceId, Integer sensor1, Integer sensor2, Long userId, Float temperatureSensor, LocalDateTime lastRead) {
@@ -42,7 +43,7 @@ public class IoTData {
         this.sensor2 = sensor2;
         this.userId = userId;
         this.temperatureSensor = temperatureSensor;
-        this.lastRead = lastRead;
+        this.lastRead = lastRead.truncatedTo(ChronoUnit.SECONDS);
     }
 
     // Gettery i settery
@@ -91,7 +92,7 @@ public class IoTData {
     }
 
     public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
+        this.timestamp = timestamp.truncatedTo(ChronoUnit.SECONDS);
     }
 
     public Long getUserId(){
@@ -107,7 +108,7 @@ public class IoTData {
     }
 
     public void setLastRead(LocalDateTime lastRead) {
-        this.lastRead = lastRead;
+        this.lastRead = lastRead.truncatedTo(ChronoUnit.SECONDS);
     }
 
     @Override

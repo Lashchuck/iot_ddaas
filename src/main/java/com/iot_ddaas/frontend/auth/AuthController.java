@@ -5,12 +5,15 @@ import com.iot_ddaas.frontend.auth.token.JwtResponse;
 import com.iot_ddaas.frontend.auth.token.JwtTokenProvider;
 import com.iot_ddaas.repository.UserRepository;
 import com.iot_ddaas.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.BufferedReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +23,7 @@ import java.util.Map;
 @RequestMapping("/auth")
 public class AuthController {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
     // Wstrzyknięcie serwisu użytkownika
     @Autowired
     private UserService userService;
@@ -36,8 +40,6 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody UserDto userDto){
-        String encryptedPassword = passwordEncoder.encode(userDto.getPassword());
-        userDto.setPassword(encryptedPassword);
         // Wywołanie serwisu w celu zarejestrowania użytkownika
         userService.registerUser(userDto);
         return ResponseEntity.ok("Użytkownik zarejestrowany");
@@ -45,6 +47,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest loginRequest){
+
+        log.info("Otrzymane dane logowania - email: {}, password: {}",  loginRequest.getEmail(), loginRequest.getPassword());
 
         User user = userRepository.findByEmail(loginRequest.getEmail());
         Map<String, Object> response = new HashMap<>();

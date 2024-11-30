@@ -52,7 +52,7 @@ public class CustomUserDetails implements UserDetails {
     }
 
     public Long getId() {
-        return user.getId(); // Możliwość uzyskania ID użytkownika
+        return user.getId();
     }
 
     public String getEmail(){

@@ -50,7 +50,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         System.out.println("Received Authorization header: " + authorizationHeader);
 
         if ("/iot/data".equals(request.getRequestURI()) || "/auth/login".equals(request.getRequestURI()) ||
-        "/auth/register".equals(request.getRequestURI()) || "/favicon.ico".equals(request.getRequestURI())) {
+        "/auth/register".equals(request.getRequestURI()) || "/favicon.ico".equals(request.getRequestURI()) ||
+        "/".equals(request.getRequestURI()) || request.getRequestURI().startsWith("/css/") || request.getRequestURI().startsWith("/js/") ||
+        "/index.html".equals(request.getRequestURI()) || "/logo192.png".equals(request.getRequestURI())) {
             // Kontynuuj bez walidacji tokena
             chain.doFilter(request, response);
             return;

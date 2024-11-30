@@ -8,6 +8,7 @@ import com.iot_ddaas.IoTData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +34,17 @@ public class IoTDataService {
         detectAnomalies(data);
     }
 
+    // Pobieranie danych z czujników wilgotności gleby z ostatnich 12 godzin
+    public List<IoTData> getSoilMoistureDataForLast12Hours(Long userId){
+        LocalDateTime twelveHoursAgo = LocalDateTime.now().minusHours(12);
+        return dataRepository.findByUserIdAndTimestampAfter(userId, twelveHoursAgo);
+    }
+
+    // Pobieranie najnowszej wartości czujnika temperatury
+    public List<IoTData> getLatestTemperatureData(Long userId){
+        LocalDateTime twentyFourHoursAgo = LocalDateTime.now().minusHours(24);
+        return dataRepository.findByUserIdAndTimestampAfter(userId, twentyFourHoursAgo);
+    }
     public void deleteData(Long id) {
         dataRepository.deleteById(id);
     }
