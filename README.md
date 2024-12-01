@@ -78,7 +78,7 @@ The IoT Data Detection and Anomaly System (DDAAS) is designed to collect, analyz
 ![App Screenshot]()
 
 **Dashboard 1 - Anomalies:**
-![App Screenshot](https://i.imgur.com/3WNMRbh.png)
+![App Screenshot](https://i.imgur.com/U3sgvib.png)
 
 **Dashboard 1 - History:**
 ![App Screenshot]()
@@ -87,7 +87,7 @@ The IoT Data Detection and Anomaly System (DDAAS) is designed to collect, analyz
 ![App Screenshot]()
 
 **Dashboard 2 - Anomalies:**
-![App Screenshot](https://i.imgur.com/yqFglKl.png)
+![App Screenshot](https://i.imgur.com/KzEFLHW.png)
 
 **Dashboard 2 - History:**
 ![App Screenshot]()
