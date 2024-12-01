@@ -66,6 +66,31 @@ The IoT Data Detection and Anomaly System (DDAAS) is designed to collect, analyz
     - Testing failed login with invalid email: Ensures login fails when an incorrect email is provided, returning the appropriate error message.
     - Testing access to protected resources: Confirms that a valid JWT token allows access to a protected endpoint by performing an authenticated GET request.
 - **GitHub Actions:** Automated testing via CI/CD.
+## Frontend screenshots
+
+**Main page:**
+![App Screenshot](https://i.imgur.com/eKwQona.png)
+
+**Login page:**
+![App Screenshot](https://i.imgur.com/67iDs1h.png)
+
+**Dashboard 1 - Main:**
+![App Screenshot]()
+
+**Dashboard 1 - Anomalies:**
+![App Screenshot](https://i.imgur.com/3WNMRbh.png)
+
+**Dashboard 1 - History:**
+![App Screenshot]()
+
+**Dashboard 2 - Main:**
+![App Screenshot]()
+
+**Dashboard 2 - Anomalies:**
+![App Screenshot](https://i.imgur.com/yqFglKl.png)
+
+**Dashboard 2 - History:**
+![App Screenshot]()
 
 ## 🔗 Link to microcontroller codes
 [![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Lashchuck/iot_ddaas_iot_devices)
