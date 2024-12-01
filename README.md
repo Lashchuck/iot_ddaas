@@ -20,7 +20,6 @@ The IoT Data Detection and Anomaly System (DDAAS) is designed to collect, analyz
 **Frontend (React)**
 
 - **React:** JavaScript library for building user interfaces.
-- **JWT Authentication:** Secure user authentication and session management.
 - **Axios:** For making HTTP requests to the backend API.
 - **Material-UI (MUI):** UI component library for building responsive, modern user interfaces.
 
