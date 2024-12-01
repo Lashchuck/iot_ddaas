@@ -1,7 +1,5 @@
 package com.iot_ddaas.frontend.auth;
 
-import org.apache.commons.logging.Log;
-
 public class LoginRequest {
 
     private String email;

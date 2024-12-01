@@ -1,22 +1,20 @@
 package com.iot_ddaas;
 
 import com.iot_ddaas.frontend.auth.CustomUserDetails;
-import com.iot_ddaas.frontend.auth.token.JwtAuthenticationFilter;
 import com.iot_ddaas.sensors.Sensor;
 import com.iot_ddaas.sensors.SoilMoistureSensor;
 import com.iot_ddaas.sensors.TemperatureSensor;
 import com.iot_ddaas.repository.AnomalyRepository;
 import com.iot_ddaas.repository.IoTDataRepository;
 import com.iot_ddaas.service.EmailService;
-
 import com.iot_ddaas.service.IoTDataService;
 import com.iot_ddaas.service.UserService;
+
 import jakarta.mail.MessagingException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,19 +23,19 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.DateTimeException;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
-
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
 
+import java.util.*;
+
+/**
+ * IoTController obsługuje żądania związane z danymi, anomaliami i monitorowaniem stanu urządzeń. Zapewnia endpointy do pobierania,
+ * usuwania i zapisywania danych, a także wykrywania i obsługi anomalii.
+ */
 @RestController
 @RequestMapping("/iot")
 public class IoTController {
-
 
     private static final Log log = LogFactory.getLog(IoTController.class);
     private static final Logger logger = LoggerFactory.getLogger(IoTController.class);
@@ -60,15 +58,12 @@ public class IoTController {
     private final Set<String> notifiedDevices = new HashSet<>();
     private boolean isFirstRun = true;
 
-    // Pobieranie wszystkich danych tylko dla danego użytkownika.
-    // Endpoint zwraca listę danych IoT dla danego użytkownika na podstawie przekazanego userId
+    /**
+     * Endpoint do pobierania wszystkich danych dla określonego userId.
+     */
     @GetMapping("/data")
     public ResponseEntity<List<IoTData>> getAllData(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
-
         Long userId = (customUserDetails !=null) ? customUserDetails.getId() :  null;
-        System.out.println("CustomUserDetails: " + customUserDetails);
-
-        logger.info("Fetching data for userId: {}", userId);
         List<IoTData> data;
 
         if (userId != null){
@@ -77,13 +72,12 @@ public class IoTController {
             data = dataRepository.findAll();
         }
 
-        logger.info("Fetched data size: {}", data.size());
-        logger.info("Fetched data content: {}", data);
-
         return ResponseEntity.ok(data);
     }
 
-    // Pobieranie konkretnej wartości z tabeli iotdata na podstawie id i userId
+    /**
+     * Endpoint do pobierania określonych danych według id i userId.
+     */
     @GetMapping("/data/{id}")
     public ResponseEntity<IoTData> getDataById(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         Long userId = customUserDetails.getId();
@@ -92,7 +86,9 @@ public class IoTController {
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
-    // Usuwanie danych danego użytkownika
+    /**
+     * Endpoint do usuwania określonego rekordu danych na podstawie id i userId.
+     */
     @DeleteMapping("/data/{id}")
     public ResponseEntity<String> deleteData(@PathVariable Long id, @AuthenticationPrincipal Long userId) {
         Optional<IoTData> data = dataRepository.findByIdAndUserId(id, userId);
@@ -104,31 +100,38 @@ public class IoTController {
         }
     }
 
-    // Endpoint dla User1 (wilgotność gleby z ostatnich 12 godzin)
+    /**
+     * Endpoint do pobierania danych o wilgotności gleby z ostatnich 12 godzin dla określonego użytkownika.
+     */
     @GetMapping("/soil-moisture/realtime")
     public List<IoTData> getSoilMoistureData(@RequestParam Long userId){
         return ioTDataService.getSoilMoistureDataForLast12Hours(userId);
     }
 
-    // Endpoint dla User2 (najnowsza wartość temperatury)
+    /**
+     * Endpoint do pobierania danych o temperaturze dla określonego użytkownika.
+     */
     @GetMapping("/temperature/realtime")
     public List<IoTData> getTemperatureData(@RequestParam Long userId){
         return ioTDataService.getLatestTemperatureData(userId);
     }
 
-    // Pobieranie wszystkich anomalii
+    /**
+     * Endpoint do pobierania wszystkich anomalii.
+     */
     @GetMapping("/anomalies")
     public List<Anomaly> getAllAnomalies() {
         return anomalyRepository.findAll();
     }
 
-    // Pobieranie danych dla danego userId w wybranym okresie czasu
+    /**
+     * Endpoint do pobierania historycznych danych dla użytkownika w określonym zakresie czasu.
+     */
     @GetMapping("/historical-data")
     public ResponseEntity<List<IoTData>> getHistoricalData(
             @RequestParam Long userId,
             @RequestParam String startDate,
             @RequestParam String endDate) {
-        logger.info("Otrzymano zapytanie o dane historyczne z zakresu: {} do {}", startDate, endDate);
 
         try {
             // Parsowanie dat
@@ -136,18 +139,21 @@ public class IoTController {
             LocalDateTime start = LocalDateTime.parse(startDate, formatter);
             LocalDateTime end = LocalDateTime.parse(endDate, formatter);
 
+            // Pobieranie danych historycznych na podstawie userId i zakresu czasu.
             List<IoTData> data = dataRepository.findByUserIdAndTimestampBetween(userId, start, end);
 
             return ResponseEntity.ok(data);
         } catch (DateTimeException e){
             return ResponseEntity.badRequest().body(null);
         } catch (Exception e){
-            logger.info("Błąd przy pobieraniu danych historycznych", e);
+            logger.info("Error while downloading historical data", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
-    // Usuwanie anomalii
+    /**
+     * Endpoint do usuwania określonej anomalii według jej id.
+     */
     @DeleteMapping("/anomalies/{id}")
     public ResponseEntity<String> deleteAnomaly(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
@@ -163,40 +169,44 @@ public class IoTController {
         }
     }
 
-    // Odbieranie i przetwarzanie danych
+    /**
+     * Endpoint do odbierania danych z czujników i przechowywania ich w bazie danych.
+     */
     @PostMapping("/data")
     public ResponseEntity<String> receiveData(@RequestBody IoTData data) {
 
+        // Sprawdzanie poprawności otrzymanych danych
         if (data.getDeviceId() == null || (data.getSensor1() == null && data.getTemperatureSensor() == null)){
-            log.error("Niepoprawne dane wejściowe: " + data);
-            return ResponseEntity.badRequest().body("Niepoprawne dane wejściowe");
+            return ResponseEntity.badRequest().body("Incorrect input data");
         }
 
         Long userId = determineUserId(data.getDeviceId());
         if (userId == null) {
-            return ResponseEntity.badRequest().body("Nieznane deviceId");
+            return ResponseEntity.badRequest().body("Unknown deviceId");
         }
 
         data.setUserId(userId);
         data.setTimestamp(LocalDateTime.now().truncatedTo((ChronoUnit.SECONDS)));
-        log.info("Otrzymane dane: " + data);
+        log.info("Received data: " + data);
 
         if (data.getSensor1() != null) {
-            log.info("Czujnik 1: " + data.getSensor1());
+            log.info("Sensor 1: " + data.getSensor1());
         }
         if (data.getSensor2() != null) {
-            log.info("Czujnik 2: " + data.getSensor2());
+            log.info("Sensor 2: " + data.getSensor2());
         }
         if (data.getTemperatureSensor() != null) {
-            log.info("Czujnik temperatury: " + data.getTemperatureSensor());
+            log.info("Temperature sensor: " + data.getTemperatureSensor());
         }
 
+        // Zapisywanie danych i wykrywanie anomalii
         dataRepository.save(data);
         dataRepository.updateLastRead(data.getDeviceId(), data.getTimestamp());
         detectAnomalies(data);
-        return ResponseEntity.ok("Dane zostały przyjęte");
+        return ResponseEntity.ok("The data has been accepted");
     }
 
+    // Metoda do określenia userId na podstawie deviceId
     private Long determineUserId(String deviceId) {
         return switch (deviceId) {
             case "ESP-32-moisture-sensors" -> 1L;
@@ -205,12 +215,14 @@ public class IoTController {
         };
     }
 
+    // Metoda do zapisywania danych, aktualizowania czasu ostatniego odczytu i wykrywania anomalii.
     public void saveData(IoTData data) {
         dataRepository.save(data);
         dataRepository.updateLastRead(data.getDeviceId(), data.getTimestamp());
         detectAnomalies(data);
     }
 
+    // Zadanie sprawdzające awarie urządzenia co 2 minuty
     @Scheduled(fixedRate = 120000)
     public void checkForDeviceFailures() {
         List<IoTData> devices = dataRepository.findAll();
@@ -246,10 +258,11 @@ public class IoTController {
         }
     }
 
+    // Obsługa awarii urządzenia poprzez utworzenie anomalii i wysłanie powiadomienia.
     private void handleDeviceFailure(String deviceId, Long userId, LocalDateTime now) {
 
         if (!notifiedDevices.contains(deviceId)){
-            log.warn("Awaria urządzenia: " + deviceId);
+            log.warn("Device failure: " + deviceId);
             Optional<Anomaly> lastAnomaly = anomalyRepository.findTopByDeviceIdOrderByTimestampDesc(deviceId);
 
             if (lastAnomaly.isPresent() && lastAnomaly.get().getTimestamp().isAfter(now.minusMinutes(1))){
@@ -266,6 +279,7 @@ public class IoTController {
         }
     }
 
+    // Wysyłanie powiadomień o anomaliach do użytkowników
     private void sendAnomalyNotification(Long userId, String deviceId, String message){
         try {
             emailService.sendAnomalyNotification(userId, deviceId, message);
@@ -274,6 +288,7 @@ public class IoTController {
         }
     }
 
+    // Wykrywanie anomalii na podstawie deviceId
     private void detectAnomalies(IoTData data){
         Long userId = data.getUserId();
         String deviceId = data.getDeviceId();
@@ -285,6 +300,7 @@ public class IoTController {
         }
     }
 
+    // Wykrywanie anomalii w danych z czujników wilgotności gleby
     private void detectSoilMoistureAnomalies(IoTData data, Long userId){
         SoilMoistureSensor sensor1 = new SoilMoistureSensor();
         sensor1.setDeviceId(data.getDeviceId());
@@ -301,9 +317,10 @@ public class IoTController {
         checkSoilMoistureSensor(sensor2, data.getSensor2(), userId);
     }
 
+    // Sprawdzanie anomalii czujnika wilgotności gleby
     private void checkSoilMoistureSensor(SoilMoistureSensor sensor, Integer sensorValue, Long userId){
         if (sensorValue == null){
-            log.warn("Brak odczytu wilgotności, awaria.");
+            log.warn("No moisture reading, failure.");
             createAndNotifyAnomaly(sensor, "Failure of microcontroller or soil moisture sensors, no reading.", userId);
         }else {
             if (sensor.detectAnomaly(10)){
@@ -312,6 +329,7 @@ public class IoTController {
         }
     }
 
+    // Wykrywanie anomalii w danych z czujników temperatury
     private void detectTemperatureAnomalies(IoTData data, Long userId) {
         TemperatureSensor temperatureSensor = new TemperatureSensor();
         temperatureSensor.setDeviceId(data.getDeviceId());
@@ -320,7 +338,7 @@ public class IoTController {
         temperatureSensor.setUserId(userId);
 
         if (data.getTemperatureSensor() == null) {
-            log.warn("Brak odczytu temperatury, awaria.");
+            log.warn("No temperature reading, failure.");
             createAndNotifyAnomaly(temperatureSensor, "Temperature sensor failure, no reading.", userId);
         } else {
             if (temperatureSensor.detectAnomaly(40)) {
@@ -329,6 +347,7 @@ public class IoTController {
         }
     }
 
+    // Tworzenie powiadomień o anomaliach
     private void createAndNotifyAnomaly(Sensor sensor, String message, Long userId){
         Anomaly anomaly = sensor.createAnomaly(message);
         anomalyRepository.save(anomaly);

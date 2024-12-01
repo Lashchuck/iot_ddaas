@@ -10,7 +10,6 @@ import java.util.TimeZone;
 public class Main {
 
 	public static void main(String[] args) {
-
 		TimeZone.setDefault(TimeZone.getTimeZone("Europe/Warsaw"));
 		SpringApplication.run(Main.class, args);
 	}

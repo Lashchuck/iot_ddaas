@@ -17,6 +17,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.Mockito.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Arrays;
@@ -48,8 +49,8 @@ public class IoTDataServiceTest {
     void shouldReturnTwoRecordsAndInvokeFindByUserIdOnce(){
         // Tworzenie listy mockowanych danych IoTData
         List<IoTData> mockData = List.of(
-                new IoTData(1L, "ESP-32-moisture-sensors", 20, 30, 1L, null, null),
-                new IoTData(2L, "ESP8266-temperature-sensor", null, null, 2L, 20.0f, null)
+                new IoTData(1L, "ESP-32-moisture-sensors", 20, 30, 1L, null, LocalDateTime.now()),
+                new IoTData(2L, "ESP8266-temperature-sensor", null, null, 2L, 20.0f, LocalDateTime.now())
         );
         when(dataRepository.findByUserId(1L)).thenReturn(mockData);
 
@@ -65,7 +66,7 @@ public class IoTDataServiceTest {
     void shouldReturnDataWithCorrectDeviceIdById(){
 
         // Tworzenie mockowanych danych IoTData
-        IoTData mockData = new IoTData(1L, "ESP-32-moisture-sensors", 20, 30, 1L, null, null);
+        IoTData mockData = new IoTData(1L, "ESP-32-moisture-sensors", 20, 30, 1L, null, LocalDateTime.now());
         // Konfiguracja mock reporyzotrium, aby zwracało dane, gdy findById(1L) zostanie wywołane.
         when(dataRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.of(mockData));
 
@@ -79,7 +80,7 @@ public class IoTDataServiceTest {
     @Test
     void shouldInvokeDataRepositoryOnceAndNotInvokeAnomalyRepository(){
 
-        IoTData mockData = new IoTData(1L, "ESP-32-moisture-sensors", 20, 30, 1L, null, null);
+        IoTData mockData = new IoTData(1L, "ESP-32-moisture-sensors", 20, 30, 1L, null, LocalDateTime.now());
 
         // Wywołanie saveData(mockData)
         ioTDataService.saveData(mockData);

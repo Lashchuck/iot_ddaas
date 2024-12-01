@@ -1,6 +1,5 @@
 package com.iot_ddaas.frontend.auth.token;
 
-import com.iot_ddaas.frontend.auth.UserDto;
 
 public class JwtResponse {
 

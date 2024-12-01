@@ -28,7 +28,6 @@ import 'chartjs-adapter-date-fns';
 import 'chartjs-adapter-moment'
 import { pl } from 'date-fns/locale';
 
-
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -79,7 +78,7 @@ ChartJS.register(
         borderRadius: '20px',
         position: 'relative',
         backgroundColor: '#f0f0f0',
-        boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.3)', // Cień dla lepszego efektu 3D
+        boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.3)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'flex-end',
@@ -93,7 +92,7 @@ ChartJS.register(
             height: thermometerHeight,
             background: getTemperatureColor(temperature),
             position: 'absolute',
-            bottom: 0, // Zaczyna od dołu, aby na górze był czerwony
+            bottom: 0,
             borderRadius: '15px',
             transition: 'all 0.3s ease', // Płynne animacje
           }}
@@ -234,7 +233,7 @@ const DashboardUser2 = () => {
         setSensorData(response.data);
         setSensorValue(response.data.at(-1)?.temperatureSensor || 0);
       } catch (error) {
-        console.error("Błąd pobierania temperatury:", error);
+        console.error("Temperature download error:", error);
       } finally {
         setLoading(false);
       }
@@ -254,7 +253,7 @@ const DashboardUser2 = () => {
               setLoadingAnomalies(false);
             })
             .catch((error) => {
-              console.error("Błąd podczas ładowania anomalii", error);
+              console.error("Error while loading anomalies", error);
               setLoadingAnomalies(false);
             });
         }
@@ -262,12 +261,12 @@ const DashboardUser2 = () => {
 
 
   const deleteAnomaly = async (id) => {
-         const token = localStorage.getItem('token'); // Pobierz token z lokalnego storage
+         const token = localStorage.getItem('token'); // Pobieranie tokenu z lokalnego storage
          console.log('Token:', token);
          try {
              const response = await axios.delete(`/iot/anomalies/${id}`, {
                  headers: {
-                     Authorization: `Bearer ${token}`, // Dodaj token do nagłówka
+                     Authorization: `Bearer ${token}`, // Dodawanie tokenu do nagłówka
                  },
              });
              console.log(response.data);
@@ -298,7 +297,7 @@ const DashboardUser2 = () => {
           });
           setHistoricalData(response.data);
       } catch (error) {
-          console.error("Błąd podczas ładowania danych historycznych", error);
+          console.error("Error while loading historical data", error);
       } finally {
            setLoadingHistoricalData(false);
       }
@@ -312,7 +311,7 @@ const DashboardUser2 = () => {
 
   const formatDateForAPI = (date) => {
       const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0'); // Miesiące zaczynają się od 0, więc dodajemy 1
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Miesiące zaczynają się od 0, trzeba dodać 1
       const day = String(date.getDate()).padStart(2, '0');
       const hour = String(date.getHours()).padStart(2, '0');
       const minute = String(date.getMinutes()).padStart(2, '0');
@@ -346,7 +345,7 @@ const DashboardUser2 = () => {
           } else if (typeof entry.timestamp === 'string') {
               entryDate = new Date(entry.timestamp);
           } else {
-              console.error('Nieznany format timestamp:', entry.timestamp);
+              console.error('Unknown timestamp format:', entry.timestamp);
               return false;
           }
 
@@ -362,7 +361,7 @@ const DashboardUser2 = () => {
           const date = new Date(year, month - 1, day, hour, minute, second || 0);
 
           if (isNaN(date.getTime())) {
-              console.error('Nieprawidłowa data z tablicy:', timestamp)
+              console.error('Incorrect date from the array:', timestamp)
               return null;
           }
           return date;
@@ -370,12 +369,12 @@ const DashboardUser2 = () => {
           const date = new Date(timestamp);
 
           if (isNaN(date.getTime())) {
-              console.error('Nieprawidłowa data z ISO:', timestamp)
+              console.error('Incorrect date from ISO:', timestamp)
               return null;
           }
           return date;
       } else {
-          console.error('Nieznany format daty:', timestamp);
+          console.error('Unknown date format:', timestamp);
           return null;
       }
   };
@@ -393,7 +392,7 @@ const DashboardUser2 = () => {
       const endTime = formatTimestamp(sortedData[sortedData.length - 1]?.timestamp);
 
       if (!startTime || !endTime) {
-          console.error('Niepoprawny zakres czasowy:', startTime, endTime);
+          console.error('Incorrect time range:', startTime, endTime);
           return [];
       }
 
@@ -417,7 +416,7 @@ const DashboardUser2 = () => {
           }
           currentTime.setMinutes(currentTime.getMinutes() + 5);
       }
-      console.log('Wypełnione dane:', filledData);
+      console.log('Filled data:', filledData);
       return filledData;
   }
 
@@ -432,14 +431,14 @@ const DashboardUser2 = () => {
 
   useEffect(() => {
         if (canvasRef.current && historicalData && historicalData.length > 0) {
-          const filledData = fillMissingTimestamps(historicalData); // Wypełnij brakujące dane
+          const filledData = fillMissingTimestamps(historicalData); // Wypełnienie brakujących danych
 
           const filteredDataSensor = filledData
             .map((data) => ({
               x: formatTimestamp(data.timestamp),
               y: (data.temperatureSensor === null || data.temperatureSensor == undefined) ? null : data.temperatureSensor,
             }))
-            .filter((data) => data.y !== null); // Filtruj puste dane
+            .filter((data) => data.y !== null); // Filtrowanie pustych danych
 
           const chartInstance = new ChartJS(canvasRef.current, {
             type: 'line',
@@ -507,7 +506,7 @@ const DashboardUser2 = () => {
             },
           });
 
-          // Zniszczenie wykresu przy odmontowywaniu komponentu
+          // Zniszczenie wykresu
           return () => {
             chartInstance.destroy();
           };
@@ -519,7 +518,7 @@ const DashboardUser2 = () => {
 
           const date = formatTimestamp(data.timestamp);
           return date ? date.toLocaleTimeString([], {
-              hour: '2-digit', minute: '2-digit'}) : "Brak danych";
+              hour: '2-digit', minute: '2-digit'}) : "No data available";
         }) : [],
 
         datasets: [
@@ -589,7 +588,7 @@ const DashboardUser2 = () => {
           value={selectedTab}
           onChange={handleTabChange}
           centered
-          textColor="inherit" // Pozwoli ustawić niestandardowe kolory
+          textColor="inherit"
           TabIndicatorProps={{
             style: {
               backgroundColor: "#6A1B9A", // Fioletowa linia pod zakładką
@@ -770,7 +769,6 @@ const DashboardUser2 = () => {
         {selectedTab === 2 && (
           <Box>
             <Typography variant="h5" align="center" gutterBottom>
-              {/* Title or content if needed */}
             </Typography>
             {loadingHistoricalData ? (
               <CircularProgress />

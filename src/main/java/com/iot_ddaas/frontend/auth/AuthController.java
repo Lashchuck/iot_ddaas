@@ -1,10 +1,9 @@
 package com.iot_ddaas.frontend.auth;
 
-import com.github.dockerjava.api.model.AuthResponse;
-import com.iot_ddaas.frontend.auth.token.JwtResponse;
 import com.iot_ddaas.frontend.auth.token.JwtTokenProvider;
 import com.iot_ddaas.repository.UserRepository;
 import com.iot_ddaas.service.UserService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.BufferedReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,18 +40,18 @@ public class AuthController {
     public ResponseEntity<String> register(@RequestBody UserDto userDto){
         // Wywołanie serwisu w celu zarejestrowania użytkownika
         userService.registerUser(userDto);
-        return ResponseEntity.ok("Użytkownik zarejestrowany");
+        return ResponseEntity.ok("User registered");
     }
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest loginRequest){
 
-        log.info("Otrzymane dane logowania - email: {}, password: {}",  loginRequest.getEmail(), loginRequest.getPassword());
+        log.info("Login details received - email: {}, password: {}",  loginRequest.getEmail(), loginRequest.getPassword());
 
         User user = userRepository.findByEmail(loginRequest.getEmail());
         Map<String, Object> response = new HashMap<>();
         if (user == null){
-            response.put("message", "Nieprawidłowy email lub hasło");
+            response.put("message", "Incorrect email or password");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }else {
             System.out.println("User role: " + user.getRole());
@@ -65,12 +63,11 @@ public class AuthController {
 
             // Generowanie tokenu JWT
             String token = jwtTokenProvider.generateToken(userDto);
-            System.out.println("Generated token: " + token);
 
             // Sprawdzanie czy token został poprawnie wygenerowany
             if (token == null || token.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(Map.of("message", "Błąd podczas generowania tokenu"));
+                        .body(Map.of("message", "Error during token generation"));
             }
 
             response.put("token", token);
@@ -79,11 +76,11 @@ public class AuthController {
             return ResponseEntity.ok(response);
 
         }catch (UserNotFoundException ex){
-            response.put("message", "Nieprawidłowy email lub hasło");
+            response.put("message", "Incorrect email or password");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }catch (Exception ex){
             // Obsługa innych wyjątków
-            response.put("message", "Wystąpił błąd podczas logowania");
+            response.put("message", "An error occurred during login");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }

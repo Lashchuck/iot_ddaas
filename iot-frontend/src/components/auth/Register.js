@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 
 function Register() {
+    // Zarządzanie danymi formularza, ładowaniem i błędami
     const [formData, setFormData] = useState({
         username: "",
         email: "",
@@ -22,22 +23,24 @@ function Register() {
     const [error, setError] = useState("");
     const navigate = useNavigate();
 
+    // Obsługa zmian w polach formularza
     const handleChange = (e) => {
         setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
+            ...formData, // Zachowanie istniejących danych formularza
+            [e.target.name]: e.target.value // Aktualizuje edytowane pole
         });
     };
 
+    // Obsługa przesyłania formularzy
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const response = await axios.post('http://localhost:8080/auth/register', formData);
-            console.log('Rejestracja udana', response.data);
-            navigate("/login");
+            console.log('Registration successful', response.data);
+            navigate("/login"); // Przekierowanie do strony logowania po udanej rejestracji
         }catch (error) {
-            console.error('Błąd rejestracji:', error);
-            setError("Wystąpił problem podczas rejestracji");
+            console.error('Registration error:', error);
+            setError("A problem occurred during registration");
         } finally {
             setLoading(false);
         }
@@ -55,6 +58,7 @@ function Register() {
         padding: 2,
       }}
     >
+      {/* Karta rejestracji */}
       <Paper
         elevation={10}
         sx={{
@@ -78,10 +82,12 @@ function Register() {
         >
           Signup
         </Typography>
+        {/* Formularz rejestracyjny */}
         <form onSubmit={handleSubmit}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
             </Grid>
+            /* Pole email */}
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -90,11 +96,12 @@ function Register() {
                 name="email"
                 variant="outlined"
                 value={formData.email}
-                onChange={handleChange}
+                onChange={handleChange} // Aktualizacja stanu nazwy użytkownika
                 required
                 sx={{ backgroundColor: "#F5F5F5", borderRadius: 2 }}
               />
             </Grid>
+            {/* Pole hasła */}
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -103,11 +110,12 @@ function Register() {
                 name="password"
                 variant="outlined"
                 value={formData.password}
-                onChange={handleChange}
+                onChange={handleChange} // Aktualizuje stan e-mail
                 required
                 sx={{ backgroundColor: "#F5F5F5", borderRadius: 2 }}
               />
             </Grid>
+            {/* Wyświetlanie komunikatu o błędzie */}
             {error && (
               <Grid item xs={12}>
                 <Typography variant="body2" color="error" align="center">
@@ -115,13 +123,14 @@ function Register() {
                 </Typography>
               </Grid>
             )}
+            {/* Przycisk przesyłania */}
             <Grid item xs={12}>
               <Button
                 fullWidth
                 variant="contained"
                 color="primary"
                 type="submit"
-                disabled={loading}
+                disabled={loading} // Wyłączenie przycisku podczas ładowania
                 sx={{
                   padding: "12px",
                   fontSize: "16px",
@@ -140,7 +149,7 @@ function Register() {
                 fullWidth
                 variant="text"
                 color="secondary"
-                onClick={() => navigate("/login")}
+                onClick={() => navigate("/login")} // Przekierowanie do strony logowania
                 sx={{
                   padding: "12px",
                   fontSize: "14px",

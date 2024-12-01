@@ -19,13 +19,10 @@ public  class TemperatureSensor extends Sensor{
         if (temperature == null){
             return true; // true, ponieważ brak odczytu jest anomalią
         }
-
         return temperature > threshold.floatValue();
     }
 
-
     public Anomaly createAnomaly(String description) {
-
         Anomaly anomaly = new Anomaly();
         anomaly.setDeviceId(this.getDeviceId());
         anomaly.setType(description);

@@ -12,6 +12,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Klasa usługi odpowiedzialna za zarządzanie danymi i anomaliami.
+ * Współdziała z repozytoriami w celu pobierania i manipulowania danymi, wykrywania anomalii i wykonywania operacji CRUD.
+ */
 @Service
 public class IoTDataService {
 
@@ -21,14 +25,17 @@ public class IoTDataService {
     @Autowired
     private AnomalyRepository anomalyRepository;
 
+    // Pobieranie wszystkich danych dla określonego userId.
     public List<IoTData> getAllData(Long userId) {
         return dataRepository.findByUserId(userId);
     }
 
+    // Pobieranie określonego rekordu danych według id dla określonego userId.
     public Optional<IoTData> getDataById(Long id, Long userId) {
         return dataRepository.findByIdAndUserId(id, userId);
     }
 
+    // Zapisywanie dostarczonych danych w repozytorium i sprawdzanie anomalii.
     public void saveData(IoTData data) {
         dataRepository.save(data);
         detectAnomalies(data);
@@ -45,17 +52,22 @@ public class IoTDataService {
         LocalDateTime twentyFourHoursAgo = LocalDateTime.now().minusHours(24);
         return dataRepository.findByUserIdAndTimestampAfter(userId, twentyFourHoursAgo);
     }
+
+    // Usunięcie rekordu danych o podanym id z repozytorium.
     public void deleteData(Long id) {
         dataRepository.deleteById(id);
     }
 
+    // Pobieranie wszystkie anomalii z repozytorium anomalii.
     public List<Anomaly> getAllAnomalies() {
         return anomalyRepository.findAll();
     }
 
+    // Usunięcie anomalii o podanym id z repozytorium.
     public void deleteAnomaly(Long id) {
         anomalyRepository.deleteById(id);
     }
 
+    // Wykrywanie anomalii na podstawie dostarczonych danych.
     private void detectAnomalies(IoTData data) {}
 }

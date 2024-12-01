@@ -1,7 +1,6 @@
 package com.iot_ddaas.sensors;
 import com.iot_ddaas.Anomaly;
 
-
 public class SoilMoistureSensor extends Sensor {
 
     private Integer moistureValue;

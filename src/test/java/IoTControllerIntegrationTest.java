@@ -69,6 +69,7 @@ public class IoTControllerIntegrationTest {
     private User user;
     private Authentication authentication;
 
+
     @BeforeEach
     void setUp(){
         User user = new User();
@@ -85,10 +86,16 @@ public class IoTControllerIntegrationTest {
     void shouldSaveDataSuccessfully() throws Exception{
         System.out.println("Zarejestrowany userId: " + userId);
 
-        IoTData data = new IoTData(1L, "ESP8266-temperature-sensor", 30, 25, userId, 25f, LocalDateTime.now());
-
+        IoTData data = new IoTData();
+        data.setUserId(userId); // Użyj ID zarejestrowanego użytkownika
+        data.setDeviceId("ESP8266-temperature-sensor");
+        data.setTemperatureSensor(25f);
+        data.setTimestamp(LocalDateTime.now());
+        data.setLastRead(LocalDateTime.now());
+        ioTDataRepository.save(data);
         // Serializaja obiektu do formatu JSON
         String json = objectMapper.writeValueAsString(data);
+        System.out.println("JSON to send: " + json);
 
         String token = jwtTokenProvider.generateToken(new UserDto(userId, "user", "test@gmail.com", "password", "ROLE_USER"));
 
@@ -99,7 +106,7 @@ public class IoTControllerIntegrationTest {
                 .andExpect(status().isOk())
                 // .andExpect(status().isBadRequest())
                 // .andExpect(content().string("Komunikat błędu: "));
-                .andExpect(content().string("Dane zostały przyjęte"));
+                .andExpect(content().string("The data has been accepted"));
     }
 
     @Test
@@ -108,7 +115,7 @@ public class IoTControllerIntegrationTest {
                 .apply(springSecurity())
                 .build();
 
-        System.out.println("Zarejestrowany userId: " + userId);
+        System.out.println("Registered userId: " + userId);
 
         IoTData ioTData = new IoTData();
         ioTData.setUserId(userId); // Użyj ID zarejestrowanego użytkownika

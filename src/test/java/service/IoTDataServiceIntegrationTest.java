@@ -18,6 +18,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -69,7 +70,7 @@ public class IoTDataServiceIntegrationTest {
     void shouldSaveAndRetrieveDataSuccessfully(){
 
         // Zapis i odczyt danych
-        IoTData data = new IoTData(null, "ESP-32-moisture-sensors", 20, 30, 1L, null, null);
+        IoTData data = new IoTData(null, "ESP-32-moisture-sensors", 20, 30, 1L, null, LocalDateTime.now());
         ioTDataService.saveData(data);
 
         List<IoTData> savedData = ioTDataService.getAllData(1L);
@@ -80,7 +81,7 @@ public class IoTDataServiceIntegrationTest {
     @Test
     void shouldSaveAndRetrieveAnomalySuccessfully(){
 
-        Anomaly anomaly = new Anomaly(null, "ESP8266-temperature-sensor", null, "Awaria", 1L, null);
+        Anomaly anomaly = new Anomaly(null, "ESP8266-temperature-sensor", LocalDateTime.now(), "Malfunction", 1L, null);
         anomalyRepository.save(anomaly);
 
         List<Anomaly> savedAnomalies = anomalyRepository.findAll();

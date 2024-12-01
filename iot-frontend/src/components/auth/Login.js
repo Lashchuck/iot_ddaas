@@ -18,25 +18,27 @@ function Login(){
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    // Obsługa wysłania formularza logowania
     const handleLogin = async (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Zatrzymanie przeładowania strony przy wysyłąniu formularza
         try {
+            // Wysyłanie żądania POST do API logowania
             const response = await axios.post("http://localhost:8080/auth/login", {
                 email,
                 password,
             });
 
-            // Sprawdź, czy logowanie zakończyło się sukcesem
+            // Sprawdzanie czy logowanie zakończyło się sukcesem
             if (response.status === 200) {
-                const { token } = response.data;
-                const { user } = response.data;
+                const { token } = response.data; // Pobieranie tokena z odpowiedzi
+                const { user } = response.data; // Pobieranie danych użytkownika z odpowiedzi
                 const userId = user.id;
 
-                // Zapisz token do localStorage
+                // Zapisanie tokena i userId do LocalStorage
                 localStorage.setItem("token", token);
                 localStorage.setItem("userId", userId);
 
-                // Przekierowanie na odpowiedni dashboard w zależności od emaila
+                // Przekierowanie użytkownika na odpowiedni dashboard w zależności od emaila
                 if (email === "matiif380@gmail.com") {
                     navigate("/dashboard-user1");
                 } else if (email === "mateusz.laszczak19@gmail.com") {
@@ -46,10 +48,10 @@ function Login(){
                 }
             }
         } catch (err) {
-            console.error("Nieudane logowanie", err);
-            setError("Nieprawidłowy email lub hasło");
+            console.error("Failed login", err);
+            setError("Incorrect email or password");
         } finally {
-            setLoading(false);
+            setLoading(false); // Ustawienie stanu ładowania na false
         }
     };
 
@@ -65,6 +67,7 @@ function Login(){
         padding: 2,
       }}
     >
+      {/* Karta formularza logowania */}
       <Paper
         elevation={10}
         sx={{
@@ -97,11 +100,12 @@ function Login(){
                 type="email"
                 variant="outlined"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)} // Aktualizacja email
                 required
                 sx={{ backgroundColor: "#F5F5F5", borderRadius: 2 }}
               />
             </Grid>
+            {/* Pole hasła */}
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -109,11 +113,12 @@ function Login(){
                 type="password"
                 variant="outlined"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)} // Aktualizacja hasła
                 required
                 sx={{ backgroundColor: "#F5F5F5", borderRadius: 2 }}
               />
             </Grid>
+            {/* Wyświetlanie błędu logowania */}
             {error && (
               <Grid item xs={12}>
                 <Typography variant="body2" color="error" align="center">
@@ -121,6 +126,7 @@ function Login(){
                 </Typography>
               </Grid>
             )}
+            {/* Przycisk logowania */}
             <Grid item xs={12}>
               <Button
                 fullWidth
@@ -140,13 +146,13 @@ function Login(){
                 {loading ? <CircularProgress size={24} color="inherit" /> : "Log in"}
               </Button>
             </Grid>
-            {/* Przycisk do przejścia na stronę rejestracji */}
+            {/* Przycisk do rejestracji */}
             <Grid item xs={12}>
               <Button
                 fullWidth
                 variant="text"
                 color="secondary"
-                onClick={() => navigate("/register")}
+                onClick={() => navigate("/register")} // Przekierowanie do rejestracji
                 sx={{
                   padding: "12px",
                   fontSize: "14px",

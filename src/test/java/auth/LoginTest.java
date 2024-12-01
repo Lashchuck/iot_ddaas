@@ -130,6 +130,6 @@ public class LoginTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(loginRequestedJson))
                 .andExpect(status().isUnauthorized()) // Sprawdzanie że odpowiedź HTTP ma status 401 Unauthorized
-                .andExpect(jsonPath("$.message").value("Nieprawidłowy email lub hasło"));
+                .andExpect(jsonPath("$.message").value("Incorrect email or password"));
     }
 }

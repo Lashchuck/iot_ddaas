@@ -98,7 +98,6 @@ public class CustomHealthIndicator implements HealthIndicator {
 
     // Sprawdzanie stanu bazy danych PostgreSQL
     private boolean checkDatabaseHealth() {
-
         try {
             jdbcTemplate.queryForObject("SELECT 1", Integer.class);
             return true;

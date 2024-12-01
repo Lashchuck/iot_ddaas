@@ -26,6 +26,7 @@ function Home() {
         backgroundSize: "cover",
       }}
     >
+      {/* Tekst nagłówka */}
       <Typography
         variant="h3"
         sx={{
@@ -36,6 +37,7 @@ function Home() {
       >
         Welcome to the Home Page!
       </Typography>
+      {/* Przyciski do nawigacji */}
       <Box sx={{ display: "flex", gap: 2 }}>
         <Button
           variant="contained"
@@ -52,8 +54,9 @@ function Home() {
         >
           Log In
         </Button>
+        {/* Przycisk rejestracji */}
         <Button
-          variant="contained" // Zmieniamy na 'contained', aby miał tło
+          variant="contained"
           sx={{
             fontSize: "16px",
             padding: "12px 24px",
