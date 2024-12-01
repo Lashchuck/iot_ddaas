@@ -15,11 +15,11 @@ The IoT Data Detection and Anomaly System (DDAAS) is designed to collect, analyz
 - **HTTP/REST:** Communication between IoT devices and the server.
 - **PostgreSQL:** Storing IoT device data and user information.
 - **Unit/Integration Testing:** Ensuring code quality and system correctness (JUnit, Mockito).
+- **GitHub Actions:** Automated testing via CI/CD.
 ---------
 **Frontend (React)**
 
 - **React:** JavaScript library for building user interfaces.
-- **JWT Authentication:** Secure user authentication and session management.
 - **Axios:** For making HTTP requests to the backend API.
 - **Material-UI (MUI):** UI component library for building responsive, modern user interfaces.
 
