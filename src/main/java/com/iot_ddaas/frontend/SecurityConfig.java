@@ -52,7 +52,7 @@ public class SecurityConfig  {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(  "/", "/favicon.ico",  "/auth/**", "/login", "/register",
                                 "/index.html", "/static/**", "/css/**", "/js/**", "/images/**", "/logo192.png").permitAll() // Zezwolenie na dostęp endpointów
-                        .requestMatchers("/iot/data").permitAll() // Zezwalanie na nieuwierzytelniony dostęp do danych IoT
+                        .requestMatchers("/iot/data", "/actuator/**").permitAll() // Zezwalanie na nieuwierzytelniony dostęp do danych IoT
                         .requestMatchers(HttpMethod.DELETE, "/iot/anomalies/**").authenticated() // Wymóg uwierzytelnienia dla usunięcia anomalii
                         .anyRequest().authenticated()) // Logowanie dla reszty zasobów
                         // Skonfiguracja zarządzania sesjami, aby używać sesji tylko wtedy, gdy jest to wymagane.

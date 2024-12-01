@@ -17,6 +17,7 @@ import java.lang.management.OperatingSystemMXBean;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class CustomHealthIndicator implements HealthIndicator {
@@ -42,13 +43,16 @@ public class CustomHealthIndicator implements HealthIndicator {
             List<Container> containers = dockerClient.listContainersCmd().withShowAll(true).exec();
             boolean allContainersRunning = true;
             boolean anyContainerRunning = false;
-            List<String> containerStatuses = new ArrayList<>();
+            List<Map<String, String>> containerStatuses = new ArrayList<>();
 
             for (Container container : containers) {
                 String containerName = container.getNames()[0];
                 String containerStatus = container.getStatus();
-                System.out.println("Container Name: " + containerName + ", Status: " + containerStatus);
-                containerStatuses.add(containerName + ": " + containerStatus);
+
+                containerStatuses.add(Map.of(
+                        "name", containerName,
+                        "status", containerStatus
+                ));
 
                 // Sprawdzanie czy kontener just uruchomiony
                 if (!containerStatus.contains("Up")) {
@@ -63,36 +67,22 @@ public class CustomHealthIndicator implements HealthIndicator {
             // Sprawdzanie zdrowia bazy danych i zasobów systemowych
             boolean databaseHealthy = checkDatabaseHealth();
             boolean systemResourcesHealthy = checkSystemResources();
-            System.out.println("CustomHealthIndicator is called");
 
             // Logika statusu kontenerów
-            Health.Builder healthBuilder = allContainersRunning ? Health.up() : Health.down();
+            Health.Builder healthBuilder = anyContainerRunning && databaseHealthy && systemResourcesHealthy
+                    ? Health.up() : Health.down();
 
-            // Żaden kontener nie jest uruchomiony
-            if (!anyContainerRunning) {
-                healthBuilder.withDetail("containers", "All containers are stopped");
-            } else if (!allContainersRunning) {
-                // Nie wszystkie kontenery są uruchomione
-                healthBuilder.withDetail("containers", "Some containers are running");
-            } else {
-                // Wszystkie kontenery są wyłączone
-                healthBuilder.withDetail("containers", "All containers are down");
-            }
+            healthBuilder
+                    .withDetail("containers", containerStatuses)
+                    .withDetail("allContainersRunning", allContainersRunning)
+                    .withDetail("anyContainerRunning", anyContainerRunning)
+                    .withDetail("database", databaseHealthy ? "Available" : "Unavailable")
+                    .withDetail("systemResources", systemResourcesHealthy ? "Healthy" : "Resource limits exceeded");
 
-            // Kontenery do zwrócenia
-            healthBuilder.withDetail("containerStatuses", containerStatuses);
-
-            if (!databaseHealthy) {
-                healthBuilder.withDetail("database", "Unavailable");
-            }
-
-            if (!systemResourcesHealthy) {
-                healthBuilder.withDetail("systemResources", "Resource limits exceeded");
-            }
             return healthBuilder.build();
 
         } catch (Exception e) {
-            return Health.down(e).withDetail("error", "Exception occurred").build();
+            return Health.down(e).withDetail("error", e.getMessage()).build();
         }
     }
 

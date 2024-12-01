@@ -55,6 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/".equals(request.getRequestURI()) ||
             "/index.html".equals(request.getRequestURI()) ||
             "/logo192.png".equals(request.getRequestURI()) ||
+            "/actuator/health".equals(request.getRequestURI()) ||
             request.getRequestURI().startsWith("/css/") ||
             request.getRequestURI().startsWith("/js/") ||
             request.getRequestURI().startsWith("/static/")) {
