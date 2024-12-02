@@ -95,5 +95,5 @@ The IoT Data Detection and Anomaly System (DDAAS) is designed to collect, analyz
 ## 🔗 Links
 **Microcontroller codes:**
 [![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Lashchuck/iot_ddaas_iot_devices)
-**LinkedIn:**
-![LinkedIn](https://img.shields.io/badge/linkedin-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white) (linkedin.com/in/mateusz-laszczak-18591433b)
+
+[![LinkedIn](https://img.shields.io/badge/linkedin-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white)](linkedin.com/in/mateusz-laszczak-18591433b)
